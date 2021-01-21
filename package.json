@@ -78,5 +78,22 @@
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",
     "typescript": "~3.9.5"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "prettier --write --ignore-unknown",
+      "ng-lint-staged lint --"
+    ],
+    "src/**/*.spec.ts": [
+      "jest --passWithNoTests "
+    ],
+    "*.{js,md,html,css,scss}": [
+      "prettier --write --ignore-unknown"
+    ]
   }
 }
