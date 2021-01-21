@@ -33,7 +33,7 @@ export class AddCommentComponent {
   }
 
   addComment() {
-    // this.add.emit(this._form.value);
+    this.add.emit(this._form.value);
     this.clear();
   }
 

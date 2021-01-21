@@ -39,7 +39,7 @@ describe('CommentComponent', () => {
     spectator.component.comment = COMMENT;
     spectator.detectChanges();
 
-    spectator.click(spectator.query(byText('Edit')));
+    spectator.click(spectator.query(byText('Edit'))!);
     spectator.detectChanges();
 
     expect(getControl(spectator, 'title')).toHaveValue(COMMENT.title);
@@ -52,13 +52,13 @@ describe('CommentComponent', () => {
     spectator.component.comment = COMMENT;
     spectator.detectChanges();
 
-    spectator.click(spectator.query(byText('Edit')));
+    spectator.click(spectator.query(byText('Edit'))!);
     spectator.detectChanges();
 
     const newTitle = 'New title';
     typeInControl(spectator, 'title', newTitle);
 
-    spectator.click(spectator.query(byText('Save')));
+    spectator.click(spectator.query(byText('Save'))!);
     spectator.detectChanges();
 
     expect(spectator.component.edit.emit).toHaveBeenCalledWith({ ...COMMENT, title: newTitle });
@@ -69,13 +69,13 @@ describe('CommentComponent', () => {
     spectator.component.comment = COMMENT;
     spectator.detectChanges();
 
-    spectator.click(spectator.query(byText('Edit')));
+    spectator.click(spectator.query(byText('Edit'))!);
     spectator.detectChanges();
 
     const newTitle = 'New title';
     typeInControl(spectator, 'title', newTitle);
 
-    spectator.click(spectator.query(byText('Cancel')));
+    spectator.click(spectator.query(byText('Cancel'))!);
     spectator.detectChanges();
 
     expect(spectator.query('.comment__name')).toHaveText(COMMENT.title);

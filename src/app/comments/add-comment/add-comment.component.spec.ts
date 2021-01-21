@@ -33,7 +33,7 @@ describe('AddCommentComponent', () => {
     typeInControl(spectator, 'text', COMMENT.text);
     addNewTagItem(spectator, COMMENT.tags);
 
-    spectator.click(spectator.query('button[type="submit"]'));
+    spectator.click(spectator.query('button[type="submit"]')!);
 
     expect(spectator.component.add.emit).toHaveBeenCalledWith(COMMENT);
   });
@@ -44,7 +44,7 @@ describe('AddCommentComponent', () => {
     typeInControl(spectator, 'title', '');
     typeInControl(spectator, 'text', '');
 
-    spectator.click(spectator.query('button[type="submit"]'));
+    spectator.click(spectator.query('button[type="submit"]')!);
 
     spectator.detectChanges();
     expect(getNearestInputError(spectator, 'title')).toExist();
@@ -55,7 +55,7 @@ describe('AddCommentComponent', () => {
   it('should clear controls after adding', () => {
     typeInControl(spectator, 'title', COMMENT.title);
     typeInControl(spectator, 'text', COMMENT.text);
-    spectator.click(spectator.query('button[type="submit"]'));
+    spectator.click(spectator.query('button[type="submit"]')!);
 
     spectator.detectChanges();
     expect(getNearestInputError(spectator, 'title')).not.toExist();
@@ -69,7 +69,7 @@ describe('AddCommentComponent', () => {
     spectator.detectChanges();
     expect(spectator.query('.add-comment__preview')).not.toExist();
 
-    spectator.click(spectator.query('.add-comment__show-preview'));
+    spectator.click(spectator.query('.add-comment__show-preview')!);
     typeInControl(spectator, 'text', COMMENT.text);
 
     spectator.detectChanges();
@@ -78,7 +78,7 @@ describe('AddCommentComponent', () => {
 
   it('should be able to display html preview after sanitizing', () => {
     // Since innerHtml automatically sanitize content we can use it to display our text
-    spectator.click(spectator.query('.add-comment__show-preview'));
+    spectator.click(spectator.query('.add-comment__show-preview')!);
     typeInControl(
       spectator,
       'text',
@@ -86,7 +86,7 @@ describe('AddCommentComponent', () => {
     );
 
     spectator.detectChanges();
-    expect(spectator.query('.add-comment__preview').innerHTML.trim()).toEqual(
+    expect(spectator.query('.add-comment__preview')!.innerHTML.trim()).toEqual(
       'simple text<strong>strong</strong><a href="http://google.com">link</a>'
     );
   });

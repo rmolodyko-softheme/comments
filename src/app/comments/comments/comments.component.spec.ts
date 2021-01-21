@@ -60,7 +60,7 @@ describe('CommentsListComponent', () => {
 
     spectator.detectChanges();
 
-    spectator.click(spectator.query('app-comment .comment__controls button.danger'));
+    spectator.click(spectator.query('app-comment .comment__controls button.danger')!);
 
     spectator.detectChanges();
     expect(commentsService.remove).toHaveBeenCalledWith(COMMENTS[0]);

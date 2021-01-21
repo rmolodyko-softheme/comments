@@ -32,7 +32,7 @@ describe('CommentsHttpService', () => {
 
   it('should be able to remove comment', () => {
     httpClient.delete.andReturn(of(null));
-    expectMarble(() => spectator.service.remove(COMMENTS[0].id), '(a|)', { a: null });
+    expectMarble(() => spectator.service.remove(COMMENTS[0].id!), '(a|)', { a: null });
   });
 
   it('should be able to add comment', () => {
