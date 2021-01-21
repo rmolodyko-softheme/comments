@@ -44,6 +44,7 @@ export class AddCommentComponent {
 
 
 
+
     this._showPreview = !this._showPreview;
     this.cd.markForCheck();
   }
