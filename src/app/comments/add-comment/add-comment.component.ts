@@ -38,14 +38,6 @@ export class AddCommentComponent {
   }
 
   togglePreview() {
-
-
-    let a: number;
-
-
-
-
-
     this._showPreview = !this._showPreview;
     this.cd.markForCheck();
   }
