@@ -1,0 +1,49 @@
+tag-input {
+  &.tag {
+    .ng2-tag-input {
+      border-bottom-color: transparent;
+    }
+
+    tag {
+      background: #f2f2f2;
+      border-radius: 3px;
+      padding: 1px 7px;
+      font-size: 12px;
+      margin-right: 8px;
+      display: inline-block;
+      line-height: 30px;
+      height: 30px;
+
+      .ng2-tag-input__text-input {
+        font-size: 14px;
+      }
+    }
+
+    delete-icon {
+      svg {
+        height: 30px !important;
+      }
+
+      &:hover {
+        transform: none;
+      }
+    }
+  }
+
+  &.readonly {
+    display: inline-block;
+
+    tag {
+      user-select: none;
+      cursor: default;
+
+      delete-icon {
+        display: none;
+      }
+    }
+
+    tag-input-form {
+      display: none;
+    }
+  }
+}

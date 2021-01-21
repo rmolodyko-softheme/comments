@@ -1,0 +1,22 @@
+.list {
+  --list-border-radius: 10px;
+
+  margin: auto;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  max-width: var(--comment-width);
+
+  &__add-comment {
+    width: 100%;
+
+    border-top: 2px solid #e1e4e8;
+    padding-top: 25px;
+  }
+
+  &__no-items {
+    color: #696969;
+    font-size: 20px;
+    margin: 50px auto;
+  }
+}

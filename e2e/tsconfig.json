@@ -1,0 +1,21 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "types": [
+      "cypress",
+      "node"
+    ],
+    "typeRoots": [
+      "./src/support"
+    ]
+  },
+  "include": [],
+  "files": [
+    "./src/support/index.d.ts"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.e2e.json"
+    }
+  ]
+}

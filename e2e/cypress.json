@@ -1,0 +1,12 @@
+{
+  "fileServerFolder": ".",
+  "fixturesFolder": "./src/fixtures",
+  "integrationFolder": "./src/integration",
+  "modifyObstructiveCode": false,
+  "pluginsFile": "./src/plugins/index",
+  "supportFile": "./src/support/index.ts",
+  "video": false,
+  "baseUrl": "http://localhost:4200",
+  "chromeWebSecurity": false,
+  "env": {}
+}

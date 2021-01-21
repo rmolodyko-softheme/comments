@@ -1,0 +1,25 @@
+<ng-container *ngIf="commentsService.comments$ | async as comments">
+  <app-comments-filter
+    *ngIf="comments.length > 0"
+    [availableTags]="commentsService.tags$ | async"
+    (filterChanged)="commentsService.filterByTags($event)"
+  ></app-comments-filter>
+
+  <section class="list">
+    <ng-container *ngIf="comments.length > 0; else emptyTemplate">
+      <app-comment
+        *ngFor="let comment of comments; trackBy: commentTrackByFn"
+        [comment]="comment"
+        (remove)="commentsService.remove($event)"
+        (edit)="commentsService.edit($event)"
+        [availableTags]="commentsService.tags$ | async"
+      ></app-comment>
+    </ng-container>
+
+    <ng-template #emptyTemplate>
+      <div class="list__no-items">There are no comments...</div>
+    </ng-template>
+  </section>
+</ng-container>
+
+<app-add-comment (add)="commentsService.add($event)" [availableTags]="commentsService.tags$ | async"></app-add-comment>

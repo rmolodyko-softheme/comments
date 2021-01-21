@@ -1,0 +1,15 @@
+@import 'assets/styles/index';
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.error-container {
+  border: 1px solid red;
+  color: red;
+}

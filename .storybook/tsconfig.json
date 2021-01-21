@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.app.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/spec",
+    "types": ["node", "jest"]
+  },
+  "exclude": ["../src/test.ts", "../src/**/*.spec.ts", "../projects/**/*.spec.ts", "**/*.spec.ts", "../node_modules"],
+  "include": ["src/**/*.ts", "../../node_modules/cypress"],
+  "files": ["./typings.d.ts"]
+}

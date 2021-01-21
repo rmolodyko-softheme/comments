@@ -1,0 +1,39 @@
+<div class="comment" [class.comment_editable]="!readonly" *ngIf="_form" [formGroup]="_form">
+  <div class="comment__header">
+    <div class="comment__name">
+      <ng-container *ngIf="readonly; else titleEditableContent">
+        {{ _form.value.title }}
+      </ng-container>
+      <ng-template #titleEditableContent>
+        <input class="input" formControlName="title" />
+        <ng-template ngxErrorMessage [control]="_form.get('title')"></ng-template>
+      </ng-template>
+    </div>
+    <div class="comment__controls">
+      <ng-container *ngIf="readonly; else editableControls">
+        <button class="btn danger outline small" (click)="remove.emit(_form.value)">Delete</button>
+        <button class="btn primary small" (click)="startEdit()">Edit</button>
+      </ng-container>
+      <ng-template #editableControls>
+        <button class="btn outline small" (click)="cancelEdit()">Cancel</button>
+        <button class="btn primary small" (click)="finishEdit()" [disabled]="!_form.valid">Save</button>
+      </ng-template>
+    </div>
+  </div>
+  <div class="comment__content">
+    <ng-container *ngIf="readonly; else textEditableContent">
+      <div class="new-line-to-br" [innerHTML]="_form.value.text | evaluateMathExpressions"></div>
+    </ng-container>
+    <ng-template #textEditableContent>
+      <textarea class="textarea" formControlName="text"> </textarea>
+      <ng-template ngxErrorMessage [control]="_form.get('text')"></ng-template>
+    </ng-template>
+  </div>
+  <div class="comment__tags" *ngIf="_form.get('tags')?.value?.length > 0">
+    <tag-input [formControl]="_form.get('tags')" class="tag" [class.readonly]="readonly">
+      <tag-input-dropdown [showDropdownIfEmpty]="true" [autocompleteItems]="availableTags">
+        <ng-template let-item="item" let-index="index">{{ item.display }}</ng-template>
+      </tag-input-dropdown>
+    </tag-input>
+  </div>
+</div>

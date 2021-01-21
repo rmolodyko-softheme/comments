@@ -1,0 +1,12 @@
+{
+  "comments": [
+    {
+      "id": 1,
+      "title": "Title of issue",
+      "text": "There is an <strong>issue</strong>. To resolve it you need 1+3+5 hours",
+      "tags": [
+        "issue"
+      ]
+    }
+  ]
+}

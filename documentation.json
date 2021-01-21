@@ -1,0 +1,3091 @@
+{
+    "pipes": [
+        {
+            "name": "EvaluateMathExpressionsPipe",
+            "id": "pipe-EvaluateMathExpressionsPipe-b9b4508e7a34f664191892b0c6dc08c9",
+            "file": "src/app/common/html-expression-pipe/evaluate-math-expressions.pipe.ts",
+            "type": "pipe",
+            "description": "",
+            "properties": [],
+            "methods": [
+                {
+                    "name": "transform",
+                    "args": [
+                        {
+                            "name": "value",
+                            "type": "string"
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "string",
+                    "typeParameters": [],
+                    "line": 8,
+                    "jsdoctags": [
+                        {
+                            "name": "value",
+                            "type": "string",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "ngname": "evaluateMathExpressions",
+            "sourceCode": "import { Pipe, PipeTransform } from '@angular/core';\nimport { evaluateMathExpressions } from './evaluate-math-expressions';\n\n@Pipe({\n  name: 'evaluateMathExpressions',\n})\nexport class EvaluateMathExpressionsPipe implements PipeTransform {\n  transform(value: string): string {\n    return evaluateMathExpressions(value);\n  }\n}\n"
+        }
+    ],
+    "interfaces": [
+        {
+            "name": "Comment",
+            "id": "interface-Comment-bb56339e9d0167709e7beaf99b5e51e0",
+            "file": "src/app/comments/models.ts",
+            "type": "interface",
+            "sourceCode": "import { Validators } from '@angular/forms';\n\nexport interface Comment {\n  id?: number;\n  title: string;\n  text: string;\n  tags: string[];\n}\n\nexport const COMMENT_TITLE_VALIDATORS = [Validators.required, Validators.minLength(2), Validators.maxLength(100)];\nexport const COMMENT_TEXT_VALIDATORS = [Validators.required, Validators.minLength(2), Validators.maxLength(1000)];\n",
+            "properties": [
+                {
+                    "name": "id",
+                    "type": "number",
+                    "optional": true,
+                    "description": "",
+                    "line": 4
+                },
+                {
+                    "name": "tags",
+                    "type": "string[]",
+                    "optional": false,
+                    "description": "",
+                    "line": 7
+                },
+                {
+                    "name": "text",
+                    "type": "string",
+                    "optional": false,
+                    "description": "",
+                    "line": 6
+                },
+                {
+                    "name": "title",
+                    "type": "string",
+                    "optional": false,
+                    "description": "",
+                    "line": 5
+                }
+            ],
+            "indexSignatures": [],
+            "kind": 150,
+            "methods": []
+        },
+        {
+            "name": "CustomRunHelpers",
+            "id": "interface-CustomRunHelpers-48e5934dd987d950cbad59f822707c43",
+            "file": "src/testing/test-utils-marble.ts",
+            "type": "interface",
+            "sourceCode": "import { TestScheduler } from 'rxjs/testing';\nimport { RunHelpers } from 'rxjs/internal/testing/TestScheduler';\nimport { Observable } from 'rxjs';\n\nexport interface CustomRunHelpers extends RunHelpers {\n  e: typeof TestScheduler.prototype.expectObservable;\n}\n\nexport function expectMarble(\n  cb: (helpers: CustomRunHelpers) => Observable<any>,\n  marble: string,\n  values?: { [key: string]: unknown },\n  error?: unknown\n): void {\n  new TestScheduler((actual, expected) => expect(actual).toEqual(expected)).run((helpers) => {\n    const expectObservable = helpers.expectObservable(cb({ ...helpers, e: helpers.expectObservable }));\n    expectObservable.toBe(marble, values, error);\n  });\n}\n",
+            "properties": [
+                {
+                    "name": "e",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 6
+                }
+            ],
+            "indexSignatures": [],
+            "kind": 150,
+            "methods": [],
+            "extends": "RunHelpers"
+        },
+        {
+            "name": "Operators",
+            "id": "interface-Operators-e5833113d25780f712c0c3f99b52c34d",
+            "file": "src/app/common/html-expression-pipe/evaluate-math-expressions.ts",
+            "type": "interface",
+            "sourceCode": "export type OperatorResolver = (a: number, b: number) => number;\n\nexport interface Operators {\n  [key: string]: OperatorResolver;\n}\n\nconst DEFAULT_OPERATORS = {\n  '+': (a, b) => a + b,\n  '-': (a, b) => a - b,\n  '*': (a, b) => a * b,\n  '/': (a, b) => a / b,\n} as Operators;\n\nexport function evaluateMathExpressions(text: string, operators = DEFAULT_OPERATORS) {\n  const opRegExp = operatorsRegExp(operators);\n  const findExpressionRegExp = new RegExp(`(\\\\s|^|\\\\()(\\\\d+((${opRegExp})\\\\d+)+)(\\\\s|\\\\)|$)`, 'g');\n\n  return text?.replace(findExpressionRegExp, (...args) => {\n    return args[1] + args[2] + `(=${calculate(args[2], operators)})` + args[args.length - 3];\n  });\n}\n\nfunction calculate(text: string, operators: Operators): number {\n  const opRegExp = operatorsRegExp(operators);\n  const findExpressionRegExp = new RegExp(`\\\\d+(${opRegExp})\\\\d+`, 'g');\n\n  const result = text.replace(findExpressionRegExp, (...args) => {\n    return parseInt(\n      (operators[args[1]] as OperatorResolver)(...(args[0].split(args[1]).map(Number) as [number, number])).toString(),\n      10\n    ).toString();\n  });\n\n  if (result === text) {\n    return Number(result);\n  }\n\n  return calculate(result, operators);\n}\n\nfunction operatorsRegExp(operators: Operators) {\n  return Object.keys(operators)\n    .map((operator) => `\\\\` + operator)\n    .join('|');\n}\n",
+            "properties": [],
+            "indexSignatures": [
+                {
+                    "id": "index-declaration-e5833113d25780f712c0c3f99b52c34d",
+                    "args": [
+                        {
+                            "name": "key",
+                            "type": "string"
+                        }
+                    ],
+                    "returnType": "OperatorResolver",
+                    "line": 3
+                }
+            ],
+            "kind": 159,
+            "methods": []
+        }
+    ],
+    "injectables": [
+        {
+            "name": "CommentsHttpService",
+            "id": "injectable-CommentsHttpService-ba753d4baebaf331bf99e06454aaac97",
+            "file": "src/app/comments/comments-http.service.ts",
+            "properties": [],
+            "methods": [
+                {
+                    "name": "add",
+                    "args": [
+                        {
+                            "name": "comment",
+                            "type": "Comment"
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "any",
+                    "typeParameters": [],
+                    "line": 13,
+                    "jsdoctags": [
+                        {
+                            "name": "comment",
+                            "type": "Comment",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "edit",
+                    "args": [
+                        {
+                            "name": "comment",
+                            "type": "Comment"
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "any",
+                    "typeParameters": [],
+                    "line": 21,
+                    "jsdoctags": [
+                        {
+                            "name": "comment",
+                            "type": "Comment",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "list",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "any",
+                    "typeParameters": [],
+                    "line": 9
+                },
+                {
+                    "name": "remove",
+                    "args": [
+                        {
+                            "name": "commentId",
+                            "type": "number"
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "any",
+                    "typeParameters": [],
+                    "line": 17,
+                    "jsdoctags": [
+                        {
+                            "name": "commentId",
+                            "type": "number",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "description": "",
+            "sourceCode": "import { Injectable } from '@angular/core';\nimport { HttpClient } from '@angular/common/http';\nimport { Comment } from './models';\n\n@Injectable()\nexport class CommentsHttpService {\n  constructor(private httpClient: HttpClient) {}\n\n  list() {\n    return this.httpClient.get<Comment[]>('/comments');\n  }\n\n  add(comment: Comment) {\n    return this.httpClient.post<Comment>('/comments', comment);\n  }\n\n  remove(commentId: number) {\n    return this.httpClient.delete<void>(`/comments/${commentId}`);\n  }\n\n  edit(comment: Comment) {\n    return this.httpClient.put<Comment>(`/comments/${comment.id}`, comment);\n  }\n}\n",
+            "constructorObj": {
+                "name": "constructor",
+                "description": "",
+                "args": [
+                    {
+                        "name": "httpClient",
+                        "type": "HttpClient"
+                    }
+                ],
+                "line": 6,
+                "jsdoctags": [
+                    {
+                        "name": "httpClient",
+                        "type": "HttpClient",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            "type": "injectable"
+        },
+        {
+            "name": "CommentsService",
+            "id": "injectable-CommentsService-b2ce2c1f62f47dadc3b92c88d93042ba",
+            "file": "src/app/comments/comments.service.ts",
+            "properties": [
+                {
+                    "name": "commentsSubject",
+                    "defaultValue": "new BehaviorSubject<Comment[]>([])",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 22,
+                    "modifierKind": [
+                        112
+                    ]
+                },
+                {
+                    "name": "filterTagsSubject",
+                    "defaultValue": "new BehaviorSubject<string[]>([])",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 21,
+                    "modifierKind": [
+                        112
+                    ]
+                },
+                {
+                    "name": "subscription",
+                    "defaultValue": "new Subscription()",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 23,
+                    "modifierKind": [
+                        112
+                    ]
+                }
+            ],
+            "methods": [
+                {
+                    "name": "add",
+                    "args": [
+                        {
+                            "name": "comment",
+                            "type": "Comment"
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 37,
+                    "jsdoctags": [
+                        {
+                            "name": "comment",
+                            "type": "Comment",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "edit",
+                    "args": [
+                        {
+                            "name": "comment",
+                            "type": "Comment"
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 47,
+                    "jsdoctags": [
+                        {
+                            "name": "comment",
+                            "type": "Comment",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "filterByTags",
+                    "args": [
+                        {
+                            "name": "tags",
+                            "type": "string[]"
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 72,
+                    "jsdoctags": [
+                        {
+                            "name": "tags",
+                            "type": "string[]",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "load",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 27
+                },
+                {
+                    "name": "ngOnDestroy",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 76
+                },
+                {
+                    "name": "remove",
+                    "args": [
+                        {
+                            "name": "comment",
+                            "type": "Comment"
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 62,
+                    "jsdoctags": [
+                        {
+                            "name": "comment",
+                            "type": "Comment",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "description": "",
+            "sourceCode": "import { Injectable, OnDestroy } from '@angular/core';\nimport { Comment } from './models';\nimport { BehaviorSubject, combineLatest, Subscription } from 'rxjs';\nimport { CommentsHttpService } from './comments-http.service';\nimport { map } from 'rxjs/operators';\nimport { deepClone, removeDuplicates } from '../common/utils/utils';\nimport { MatSnackBar } from '@angular/material/snack-bar';\n\n@Injectable()\nexport class CommentsService implements OnDestroy {\n  get comments$() {\n    return combineLatest([this.commentsSubject.asObservable(), this.filterTagsSubject.asObservable()]).pipe(\n      map(filterCommentsByTags)\n    );\n  }\n\n  get tags$() {\n    return this.commentsSubject.asObservable().pipe(map(getCommentTags));\n  }\n\n  private filterTagsSubject = new BehaviorSubject<string[]>([]);\n  private commentsSubject = new BehaviorSubject<Comment[]>([]);\n  private subscription = new Subscription();\n\n  constructor(private commentsHttpService: CommentsHttpService, private snackbar: MatSnackBar) {}\n\n  load() {\n    // We do not need to unsubscribe of this observable because it triggers only once, also we can convert it to promise\n    // But i think it is a good practice to unsubscribe of every observable on the application\n    this.subscription.add(\n      this.commentsHttpService.list().subscribe((data) => {\n        this.commentsSubject.next(data);\n      })\n    );\n  }\n\n  add(comment: Comment) {\n    this.subscription.add(\n      this.commentsHttpService.add(comment).subscribe((data) => {\n        this.commentsSubject.next([...this.commentsSubject.value, data]);\n\n        this.snackbar.open('Comment was added.');\n      })\n    );\n  }\n\n  edit(comment: Comment) {\n    this.subscription.add(\n      this.commentsHttpService.edit(comment).subscribe((data) => {\n        const comments = this.commentsSubject.value.slice();\n        const index = comments.findIndex((item) => item.id === data.id);\n        if (index !== -1) {\n          comments[index] = data;\n          this.commentsSubject.next(comments);\n\n          this.snackbar.open('Comment was edited.');\n        }\n      })\n    );\n  }\n\n  remove(comment: Comment) {\n    this.subscription.add(\n      this.commentsHttpService.remove(comment.id!).subscribe(() => {\n        this.commentsSubject.next(this.commentsSubject.value.filter((item) => item.id !== comment.id));\n\n        this.snackbar.open('Comment was removed.');\n      })\n    );\n  }\n\n  filterByTags(tags: string[]) {\n    this.filterTagsSubject.next(tags);\n  }\n\n  ngOnDestroy() {\n    this.subscription.unsubscribe();\n  }\n}\n\nexport function getCommentTags(comments: Comment[]) {\n  const tags = [];\n  for (let comment of comments) {\n    tags.push(...comment.tags);\n  }\n\n  return removeDuplicates(tags);\n}\n\nexport function filterCommentsByTags([comments, tags]: [Comment[], string[]]) {\n  if (tags.length > 0) {\n    const newComments = [];\n    for (let comment of comments) {\n      if (comment.tags.some((tag) => tags.includes(tag))) {\n        const newComment = deepClone(comment);\n        newComments.push(newComment);\n      }\n    }\n\n    return newComments;\n  } else {\n    return comments;\n  }\n}\n",
+            "constructorObj": {
+                "name": "constructor",
+                "description": "",
+                "args": [
+                    {
+                        "name": "commentsHttpService",
+                        "type": "CommentsHttpService"
+                    },
+                    {
+                        "name": "snackbar",
+                        "type": "MatSnackBar"
+                    }
+                ],
+                "line": 23,
+                "jsdoctags": [
+                    {
+                        "name": "commentsHttpService",
+                        "type": "CommentsHttpService",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "snackbar",
+                        "type": "MatSnackBar",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            "accessors": {
+                "comments$": {
+                    "name": "comments$",
+                    "getSignature": {
+                        "name": "comments$",
+                        "type": "",
+                        "returnType": "",
+                        "line": 11
+                    }
+                },
+                "tags$": {
+                    "name": "tags$",
+                    "getSignature": {
+                        "name": "tags$",
+                        "type": "",
+                        "returnType": "",
+                        "line": 17
+                    }
+                }
+            },
+            "type": "injectable"
+        }
+    ],
+    "classes": [],
+    "directives": [],
+    "components": [
+        {
+            "name": "AddCommentComponent",
+            "id": "component-AddCommentComponent-2376236652f96598dd8eeff5e5a9ec8f",
+            "file": "src/app/comments/add-comment/add-comment.component.ts",
+            "changeDetection": "ChangeDetectionStrategy.OnPush",
+            "encapsulation": [],
+            "entryComponents": [],
+            "inputs": [],
+            "outputs": [],
+            "providers": [],
+            "selector": "app-add-comment",
+            "styleUrls": [
+                "./add-comment.component.scss"
+            ],
+            "styles": [],
+            "templateUrl": [
+                "./add-comment.component.html"
+            ],
+            "viewProviders": [],
+            "inputsClass": [
+                {
+                    "name": "availableTags",
+                    "defaultValue": "[]",
+                    "line": 12,
+                    "type": "string[]"
+                }
+            ],
+            "outputsClass": [
+                {
+                    "name": "add",
+                    "defaultValue": "new EventEmitter()",
+                    "line": 13,
+                    "type": "EventEmitter"
+                }
+            ],
+            "propertiesClass": [
+                {
+                    "name": "_form",
+                    "type": "FormGroup",
+                    "optional": false,
+                    "description": "",
+                    "line": 15
+                },
+                {
+                    "name": "_showPreview",
+                    "defaultValue": "false",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 16
+                }
+            ],
+            "methodsClass": [
+                {
+                    "name": "addComment",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 35
+                },
+                {
+                    "name": "clear",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 26
+                },
+                {
+                    "name": "togglePreview",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 40
+                }
+            ],
+            "hostBindings": [],
+            "hostListeners": [],
+            "description": "",
+            "rawdescription": "",
+            "type": "component",
+            "sourceCode": "import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';\nimport { FormBuilder, FormGroup } from '@angular/forms';\nimport { Comment, COMMENT_TEXT_VALIDATORS, COMMENT_TITLE_VALIDATORS } from '../models';\n\n@Component({\n  selector: 'app-add-comment',\n  templateUrl: './add-comment.component.html',\n  styleUrls: ['./add-comment.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class AddCommentComponent {\n  @Input() availableTags: string[] = [];\n  @Output() add = new EventEmitter();\n\n  _form: FormGroup;\n  _showPreview = false;\n\n  constructor(private readonly fb: FormBuilder, private readonly cd: ChangeDetectorRef) {\n    this._form = this.fb.group({\n      title: [null, COMMENT_TITLE_VALIDATORS],\n      text: [null, COMMENT_TEXT_VALIDATORS],\n      tags: [[]],\n    });\n  }\n\n  clear() {\n    this._form.setValue({\n      title: '',\n      text: '',\n      tags: [],\n    } as Comment);\n    this._form.markAsUntouched();\n  }\n\n  addComment() {\n    this.add.emit(this._form.value);\n    this.clear();\n  }\n\n  togglePreview() {\n    this._showPreview = !this._showPreview;\n    this.cd.markForCheck();\n  }\n}\n",
+            "assetsDirs": [],
+            "styleUrlsData": [
+                {
+                    "data": ":host {\n  display: block;\n  margin: auto;\n  margin-top: 30px;\n  border: 1px solid #e6e6e6;\n  border-radius: 5px;\n  background: #f9f9f9;\n  max-width: var(--comment-width);\n}\n\n.add-comment {\n  --input-margin: 20px;\n\n  padding: 20px;\n\n  &__text {\n    margin-top: var(--input-margin);\n  }\n\n  &__tag {\n    margin-top: var(--input-margin);\n\n    ::ng-deep input {\n      border: 1px solid #e1e4e8;\n      border-radius: 6px;\n      outline: none;\n      box-shadow: 0 0 0 1px rgba(225, 228, 232, 0.2);\n      height: 31px;\n    }\n  }\n\n  &__controls {\n    margin-top: var(--input-margin);\n    text-align: right;\n\n    button {\n      margin-left: 10px;\n    }\n  }\n\n  &__show-preview {\n    margin-top: 10px;\n    display: flex;\n    align-items: center;\n\n    color: #757575;\n    font: 400 13px/20px Roboto, 'Helvetica Neue', sans-serif;\n    letter-spacing: normal;\n    line-height: 1.5;\n\n    input {\n      margin-right: 10px;\n    }\n  }\n\n  &__preview {\n    margin: 10px 0;\n    border: 1px solid #c5c5c5;\n    border-radius: 3px;\n    padding: 10px;\n  }\n}\n",
+                    "styleUrl": "./add-comment.component.scss"
+                }
+            ],
+            "stylesData": "",
+            "constructorObj": {
+                "name": "constructor",
+                "description": "",
+                "args": [
+                    {
+                        "name": "fb",
+                        "type": "FormBuilder"
+                    },
+                    {
+                        "name": "cd",
+                        "type": "ChangeDetectorRef"
+                    }
+                ],
+                "line": 16,
+                "jsdoctags": [
+                    {
+                        "name": "fb",
+                        "type": "FormBuilder",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "cd",
+                        "type": "ChangeDetectorRef",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            "templateData": "<form class=\"list__add-comment add-comment\" [formGroup]=\"_form\" (ngSubmit)=\"addComment()\">\n  <input class=\"input add-comment__title\" placeholder=\"Title\" formControlName=\"title\" required />\n  <ng-template ngxErrorMessage [control]=\"_form.get('title')\"></ng-template>\n\n  <textarea class=\"textarea gray add-comment__text\" placeholder=\"Text\" formControlName=\"text\" required></textarea>\n  <ng-template ngxErrorMessage [control]=\"_form.get('text')\"></ng-template>\n\n  <label class=\"add-comment__show-preview\">\n    <input type=\"checkbox\" (click)=\"togglePreview()\" />\n    Show text preview\n  </label>\n\n  <div\n    class=\"add-comment__preview new-line-to-br\"\n    *ngIf=\"_showPreview\"\n    [innerHTML]=\"_form.get('text').value | evaluateMathExpressions\"\n  ></div>\n\n  <tag-input class=\"tag add-comment__tag\" formControlName=\"tags\" ngDefaultControl [modelAsStrings]=\"true\">\n    <tag-input-dropdown [showDropdownIfEmpty]=\"true\" [autocompleteItems]=\"availableTags\">\n      <ng-template let-item=\"item\" let-index=\"index\">{{ item.display }}</ng-template>\n    </tag-input-dropdown>\n  </tag-input>\n\n  <div class=\"add-comment__controls\">\n    <button class=\"btn outline\" type=\"button\" (click)=\"clear()\">Clear</button>\n    <button class=\"btn primary\" type=\"submit\" [disabled]=\"!_form.valid\">Add New Comment</button>\n  </div>\n</form>\n"
+        },
+        {
+            "name": "AppComponent",
+            "id": "component-AppComponent-ac0b9503588b57db2fbfb65b720729e8",
+            "file": "src/app/app.component.ts",
+            "changeDetection": "ChangeDetectionStrategy.OnPush",
+            "encapsulation": [],
+            "entryComponents": [],
+            "inputs": [],
+            "outputs": [],
+            "providers": [],
+            "selector": "app-root",
+            "styleUrls": [
+                "./app.component.scss"
+            ],
+            "styles": [],
+            "templateUrl": [
+                "./app.component.html"
+            ],
+            "viewProviders": [],
+            "inputsClass": [],
+            "outputsClass": [],
+            "propertiesClass": [],
+            "methodsClass": [],
+            "hostBindings": [],
+            "hostListeners": [],
+            "description": "",
+            "rawdescription": "",
+            "type": "component",
+            "sourceCode": "import { ChangeDetectionStrategy, Component } from '@angular/core';\n\n@Component({\n  selector: 'app-root',\n  templateUrl: './app.component.html',\n  styleUrls: ['./app.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class AppComponent {}\n",
+            "assetsDirs": [],
+            "styleUrlsData": [
+                {
+                    "data": ".container {\n  padding: 15px;\n  margin: auto;\n  min-width: 335px;\n}\n",
+                    "styleUrl": "./app.component.scss"
+                }
+            ],
+            "stylesData": "",
+            "templateData": "<div class=\"container\">\n  <router-outlet></router-outlet>\n</div>\n"
+        },
+        {
+            "name": "ButtonComponent",
+            "id": "component-ButtonComponent-11e73fb20401927eb5f41888b74c905a",
+            "file": "src/stories/button/button.component.ts",
+            "encapsulation": [],
+            "entryComponents": [],
+            "inputs": [],
+            "outputs": [],
+            "providers": [],
+            "selector": "storybook-button",
+            "styleUrls": [
+                "./button.scss"
+            ],
+            "styles": [],
+            "template": "<button type=\"button\" class=\"btn\" [ngClass]=\"classes\">Button</button>",
+            "templateUrl": [],
+            "viewProviders": [],
+            "inputsClass": [
+                {
+                    "name": "classes",
+                    "defaultValue": "[]",
+                    "description": "<p>Button classes</p>\n",
+                    "line": 15,
+                    "type": "string[]"
+                }
+            ],
+            "outputsClass": [],
+            "propertiesClass": [],
+            "methodsClass": [],
+            "hostBindings": [],
+            "hostListeners": [],
+            "description": "",
+            "rawdescription": "",
+            "type": "component",
+            "sourceCode": "import { Component, Input } from '@angular/core';\n\n@Component({\n  selector: 'storybook-button',\n  template: ` <button type=\"button\" class=\"btn\" [ngClass]=\"classes\">Button</button>`,\n  styleUrls: ['./button.scss'],\n})\nexport default class ButtonComponent {\n  /**\n   * Button classes\n   *\n   * @required\n   */\n  @Input()\n  classes: string[] = [];\n}\n",
+            "assetsDirs": [],
+            "styleUrlsData": [
+                {
+                    "data": "@import '../../assets/styles/index';\n",
+                    "styleUrl": "./button.scss"
+                }
+            ],
+            "stylesData": ""
+        },
+        {
+            "name": "CommentComponent",
+            "id": "component-CommentComponent-adbd4b28523832894c6bb1b376fe26fd",
+            "file": "src/app/comments/comment/comment.component.ts",
+            "changeDetection": "ChangeDetectionStrategy.OnPush",
+            "encapsulation": [],
+            "entryComponents": [],
+            "inputs": [],
+            "outputs": [],
+            "providers": [],
+            "selector": "app-comment",
+            "styleUrls": [
+                "./comment.component.scss"
+            ],
+            "styles": [],
+            "templateUrl": [
+                "./comment.component.html"
+            ],
+            "viewProviders": [],
+            "inputsClass": [
+                {
+                    "name": "availableTags",
+                    "defaultValue": "[]",
+                    "line": 16,
+                    "type": "string[]"
+                },
+                {
+                    "name": "comment",
+                    "line": 13,
+                    "type": ""
+                },
+                {
+                    "name": "readonly",
+                    "defaultValue": "true",
+                    "line": 17
+                }
+            ],
+            "outputsClass": [
+                {
+                    "name": "edit",
+                    "defaultValue": "new EventEmitter<Comment>()",
+                    "line": 20,
+                    "type": "EventEmitter"
+                },
+                {
+                    "name": "remove",
+                    "defaultValue": "new EventEmitter<Comment>()",
+                    "line": 19,
+                    "type": "EventEmitter"
+                }
+            ],
+            "propertiesClass": [
+                {
+                    "name": "_form",
+                    "type": "FormGroup",
+                    "optional": false,
+                    "description": "",
+                    "line": 22
+                },
+                {
+                    "name": "commentSnapshot",
+                    "type": "Comment",
+                    "optional": true,
+                    "description": "",
+                    "line": 23,
+                    "modifierKind": [
+                        112
+                    ]
+                }
+            ],
+            "methodsClass": [
+                {
+                    "name": "cancelEdit",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 45
+                },
+                {
+                    "name": "finishEdit",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 39
+                },
+                {
+                    "name": "startEdit",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 34
+                }
+            ],
+            "hostBindings": [],
+            "hostListeners": [],
+            "description": "",
+            "rawdescription": "",
+            "type": "component",
+            "sourceCode": "import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';\nimport { Comment, COMMENT_TEXT_VALIDATORS, COMMENT_TITLE_VALIDATORS } from '../models';\nimport { FormBuilder, FormGroup } from '@angular/forms';\nimport { deepClone } from '../../common/utils/utils';\n\n@Component({\n  selector: 'app-comment',\n  templateUrl: './comment.component.html',\n  styleUrls: ['./comment.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class CommentComponent {\n  @Input() set comment(value: Comment) {\n    this._form.setValue(value);\n  }\n  @Input() availableTags: string[] = [];\n  @Input() readonly = true;\n\n  @Output() remove = new EventEmitter<Comment>();\n  @Output() edit = new EventEmitter<Comment>();\n\n  _form: FormGroup;\n  private commentSnapshot?: Comment;\n\n  constructor(private readonly fb: FormBuilder, private cd: ChangeDetectorRef) {\n    this._form = this.fb.group({\n      id: [],\n      title: [null, COMMENT_TITLE_VALIDATORS],\n      text: [null, COMMENT_TEXT_VALIDATORS],\n      tags: [[]],\n    });\n  }\n\n  startEdit() {\n    this.readonly = false;\n    this.commentSnapshot = deepClone(this._form.value!);\n  }\n\n  finishEdit() {\n    this.readonly = true;\n    this.edit.emit(this._form.value!);\n    this.cd.markForCheck();\n  }\n\n  cancelEdit() {\n    this.readonly = true;\n    this._form.setValue(this.commentSnapshot!);\n    this.cd.markForCheck();\n  }\n}\n",
+            "assetsDirs": [],
+            "styleUrlsData": [
+                {
+                    "data": ":host {\n  display: block;\n  width: 100%;\n}\n\n.comment {\n  width: 100%;\n  display: block;\n  margin-bottom: 25px;\n  border-radius: var(--list-border-radius);\n  border: 1px solid #eee;\n\n  &__header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    margin-bottom: 10px;\n    padding: 16px;\n    background: #f6f8fa;\n    border-radius: var(--list-border-radius) var(--list-border-radius) 0 0;\n  }\n\n  &__name {\n    font-weight: 500;\n    width: 100%;\n    margin-right: 10px;\n\n    ::ng-deep .input + ngx-error-message {\n      position: absolute;\n      margin-top: -3px;\n    }\n  }\n\n  &_editable .comment__name {\n    font-weight: normal;\n  }\n\n  &__content {\n    padding: 15px;\n\n    ::ng-deep .textarea + ngx-error-message {\n      position: absolute;\n      margin-top: -3px;\n    }\n  }\n\n  &__controls {\n    display: flex;\n    align-items: center;\n\n    button {\n      margin-left: 5px;\n    }\n  }\n\n  &__tags {\n    padding: 15px;\n  }\n}\n",
+                    "styleUrl": "./comment.component.scss"
+                }
+            ],
+            "stylesData": "",
+            "constructorObj": {
+                "name": "constructor",
+                "description": "",
+                "args": [
+                    {
+                        "name": "fb",
+                        "type": "FormBuilder"
+                    },
+                    {
+                        "name": "cd",
+                        "type": "ChangeDetectorRef"
+                    }
+                ],
+                "line": 23,
+                "jsdoctags": [
+                    {
+                        "name": "fb",
+                        "type": "FormBuilder",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "cd",
+                        "type": "ChangeDetectorRef",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            "accessors": {
+                "comment": {
+                    "name": "comment",
+                    "setSignature": {
+                        "name": "comment",
+                        "type": "void",
+                        "args": [
+                            {
+                                "name": "value",
+                                "type": ""
+                            }
+                        ],
+                        "returnType": "void",
+                        "line": 13,
+                        "jsdoctags": [
+                            {
+                                "name": "value",
+                                "type": "",
+                                "tagName": {
+                                    "text": "param"
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            "templateData": "<div class=\"comment\" [class.comment_editable]=\"!readonly\" *ngIf=\"_form\" [formGroup]=\"_form\">\n  <div class=\"comment__header\">\n    <div class=\"comment__name\">\n      <ng-container *ngIf=\"readonly; else titleEditableContent\">\n        {{ _form.value.title }}\n      </ng-container>\n      <ng-template #titleEditableContent>\n        <input class=\"input\" formControlName=\"title\" />\n        <ng-template ngxErrorMessage [control]=\"_form.get('title')\"></ng-template>\n      </ng-template>\n    </div>\n    <div class=\"comment__controls\">\n      <ng-container *ngIf=\"readonly; else editableControls\">\n        <button class=\"btn danger outline small\" (click)=\"remove.emit(_form.value)\">Delete</button>\n        <button class=\"btn primary small\" (click)=\"startEdit()\">Edit</button>\n      </ng-container>\n      <ng-template #editableControls>\n        <button class=\"btn outline small\" (click)=\"cancelEdit()\">Cancel</button>\n        <button class=\"btn primary small\" (click)=\"finishEdit()\" [disabled]=\"!_form.valid\">Save</button>\n      </ng-template>\n    </div>\n  </div>\n  <div class=\"comment__content\">\n    <ng-container *ngIf=\"readonly; else textEditableContent\">\n      <div class=\"new-line-to-br\" [innerHTML]=\"_form.value.text | evaluateMathExpressions\"></div>\n    </ng-container>\n    <ng-template #textEditableContent>\n      <textarea class=\"textarea\" formControlName=\"text\"> </textarea>\n      <ng-template ngxErrorMessage [control]=\"_form.get('text')\"></ng-template>\n    </ng-template>\n  </div>\n  <div class=\"comment__tags\" *ngIf=\"_form.get('tags')?.value?.length > 0\">\n    <tag-input [formControl]=\"_form.get('tags')\" class=\"tag\" [class.readonly]=\"readonly\">\n      <tag-input-dropdown [showDropdownIfEmpty]=\"true\" [autocompleteItems]=\"availableTags\">\n        <ng-template let-item=\"item\" let-index=\"index\">{{ item.display }}</ng-template>\n      </tag-input-dropdown>\n    </tag-input>\n  </div>\n</div>\n"
+        },
+        {
+            "name": "CommentsComponent",
+            "id": "component-CommentsComponent-51e9645d9bf63a9b301b9cec0ce1a4c6",
+            "file": "src/app/comments/comments/comments.component.ts",
+            "changeDetection": "ChangeDetectionStrategy.OnPush",
+            "encapsulation": [],
+            "entryComponents": [],
+            "inputs": [],
+            "outputs": [],
+            "providers": [],
+            "selector": "app-comments",
+            "styleUrls": [
+                "./comments.component.scss"
+            ],
+            "styles": [],
+            "templateUrl": [
+                "./comments.component.html"
+            ],
+            "viewProviders": [],
+            "inputsClass": [],
+            "outputsClass": [],
+            "propertiesClass": [
+                {
+                    "name": "commentsService",
+                    "type": "CommentsService",
+                    "optional": false,
+                    "description": "",
+                    "line": 12,
+                    "modifierKind": [
+                        114,
+                        132
+                    ]
+                }
+            ],
+            "methodsClass": [
+                {
+                    "name": "commentTrackByFn",
+                    "args": [
+                        {
+                            "name": "index",
+                            "type": "number"
+                        },
+                        {
+                            "name": "comment",
+                            "type": "Comment"
+                        }
+                    ],
+                    "optional": false,
+                    "returnType": "any",
+                    "typeParameters": [],
+                    "line": 18,
+                    "jsdoctags": [
+                        {
+                            "name": "index",
+                            "type": "number",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        },
+                        {
+                            "name": "comment",
+                            "type": "Comment",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "ngOnInit",
+                    "args": [],
+                    "optional": false,
+                    "returnType": "void",
+                    "typeParameters": [],
+                    "line": 14
+                }
+            ],
+            "hostBindings": [],
+            "hostListeners": [],
+            "description": "",
+            "rawdescription": "",
+            "type": "component",
+            "sourceCode": "import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';\nimport { CommentsService } from '../comments.service';\nimport { Comment } from '../models';\n\n@Component({\n  selector: 'app-comments',\n  templateUrl: './comments.component.html',\n  styleUrls: ['./comments.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class CommentsComponent implements OnInit {\n  constructor(public readonly commentsService: CommentsService) {}\n\n  ngOnInit() {\n    this.commentsService.load();\n  }\n\n  commentTrackByFn(index: number, comment: Comment) {\n    return comment.id;\n  }\n}\n",
+            "assetsDirs": [],
+            "styleUrlsData": [
+                {
+                    "data": ".list {\n  --list-border-radius: 10px;\n\n  margin: auto;\n  display: flex;\n  flex-flow: column;\n  align-items: center;\n  max-width: var(--comment-width);\n\n  &__add-comment {\n    width: 100%;\n\n    border-top: 2px solid #e1e4e8;\n    padding-top: 25px;\n  }\n\n  &__no-items {\n    color: #696969;\n    font-size: 20px;\n    margin: 50px auto;\n  }\n}\n",
+                    "styleUrl": "./comments.component.scss"
+                }
+            ],
+            "stylesData": "",
+            "constructorObj": {
+                "name": "constructor",
+                "description": "",
+                "args": [
+                    {
+                        "name": "commentsService",
+                        "type": "CommentsService"
+                    }
+                ],
+                "line": 11,
+                "jsdoctags": [
+                    {
+                        "name": "commentsService",
+                        "type": "CommentsService",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            "implements": [
+                "OnInit"
+            ],
+            "templateData": "<ng-container *ngIf=\"commentsService.comments$ | async as comments\">\n  <app-comments-filter\n    *ngIf=\"comments.length > 0\"\n    [availableTags]=\"commentsService.tags$ | async\"\n    (filterChanged)=\"commentsService.filterByTags($event)\"\n  ></app-comments-filter>\n\n  <section class=\"list\">\n    <ng-container *ngIf=\"comments.length > 0; else emptyTemplate\">\n      <app-comment\n        *ngFor=\"let comment of comments; trackBy: commentTrackByFn\"\n        [comment]=\"comment\"\n        (remove)=\"commentsService.remove($event)\"\n        (edit)=\"commentsService.edit($event)\"\n        [availableTags]=\"commentsService.tags$ | async\"\n      ></app-comment>\n    </ng-container>\n\n    <ng-template #emptyTemplate>\n      <div class=\"list__no-items\">There are no comments...</div>\n    </ng-template>\n  </section>\n</ng-container>\n\n<app-add-comment (add)=\"commentsService.add($event)\" [availableTags]=\"commentsService.tags$ | async\"></app-add-comment>\n"
+        },
+        {
+            "name": "CommentsFilterComponent",
+            "id": "component-CommentsFilterComponent-2e5727d749beb124e57367773f658c4a",
+            "file": "src/app/comments/comments-filter/comments-filter.component.ts",
+            "changeDetection": "ChangeDetectionStrategy.OnPush",
+            "encapsulation": [],
+            "entryComponents": [],
+            "inputs": [],
+            "outputs": [],
+            "providers": [],
+            "selector": "app-comments-filter",
+            "styleUrls": [
+                "./comments-filter.component.scss"
+            ],
+            "styles": [],
+            "templateUrl": [
+                "./comments-filter.component.html"
+            ],
+            "viewProviders": [],
+            "inputsClass": [
+                {
+                    "name": "availableTags",
+                    "defaultValue": "[]",
+                    "line": 11,
+                    "type": "string[]"
+                }
+            ],
+            "outputsClass": [
+                {
+                    "name": "filterChanged",
+                    "defaultValue": "new EventEmitter<string[]>()",
+                    "line": 12,
+                    "type": "EventEmitter"
+                }
+            ],
+            "propertiesClass": [
+                {
+                    "name": "_control",
+                    "defaultValue": "new FormControl()",
+                    "type": "",
+                    "optional": false,
+                    "description": "",
+                    "line": 14
+                }
+            ],
+            "methodsClass": [],
+            "hostBindings": [],
+            "hostListeners": [],
+            "description": "",
+            "rawdescription": "",
+            "type": "component",
+            "sourceCode": "import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';\nimport { FormControl } from '@angular/forms';\n\n@Component({\n  selector: 'app-comments-filter',\n  templateUrl: './comments-filter.component.html',\n  styleUrls: ['./comments-filter.component.scss'],\n  changeDetection: ChangeDetectionStrategy.OnPush,\n})\nexport class CommentsFilterComponent {\n  @Input() availableTags: string[] = [];\n  @Output() filterChanged = new EventEmitter<string[]>();\n\n  _control = new FormControl();\n}\n",
+            "assetsDirs": [],
+            "styleUrlsData": [
+                {
+                    "data": ".comments-filter {\n  max-width: var(--comment-width);\n  margin: 0 auto 10px auto;\n  padding-top: 5px;\n}\n",
+                    "styleUrl": "./comments-filter.component.scss"
+                }
+            ],
+            "stylesData": "",
+            "templateData": "<div class=\"comments-filter\">\n  <tag-input\n    class=\"tag comments-filter__tag\"\n    [modelAsStrings]=\"true\"\n    [onlyFromAutocomplete]=\"true\"\n    (ngModelChange)=\"filterChanged.emit($event)\"\n    [formControl]=\"_control\"\n    [secondaryPlaceholder]=\"'Find comments by tags'\"\n  >\n    <tag-input-dropdown [showDropdownIfEmpty]=\"true\" [limitItemsTo]=\"20\" [autocompleteItems]=\"availableTags\">\n      <ng-template let-item=\"item\" let-index=\"index\"\n        ><span class=\"comments-filter__autocomplete-item\">{{ item.display }}</span></ng-template\n      >\n    </tag-input-dropdown>\n  </tag-input>\n</div>\n"
+        },
+        {
+            "name": "InputComponent",
+            "id": "component-InputComponent-4f9e1a682614cbbd18be1318fb712c7f",
+            "file": "src/stories/input/input.component.ts",
+            "encapsulation": [],
+            "entryComponents": [],
+            "inputs": [],
+            "outputs": [],
+            "providers": [],
+            "selector": "storybook-input",
+            "styleUrls": [
+                "./input.scss"
+            ],
+            "styles": [],
+            "template": "<div><input type=\"text\" class=\"input\" [ngClass]=\"classes\" /></div>    <div><textarea class=\"textarea\" [ngClass]=\"classes\"></textarea></div>",
+            "templateUrl": [],
+            "viewProviders": [],
+            "inputsClass": [
+                {
+                    "name": "classes",
+                    "defaultValue": "[]",
+                    "description": "<p>Classes</p>\n",
+                    "line": 16,
+                    "type": "string[]"
+                }
+            ],
+            "outputsClass": [],
+            "propertiesClass": [],
+            "methodsClass": [],
+            "hostBindings": [],
+            "hostListeners": [],
+            "description": "",
+            "rawdescription": "",
+            "type": "component",
+            "sourceCode": "import { Component, Input } from '@angular/core';\n\n@Component({\n  selector: 'storybook-input',\n  template: `<div><input type=\"text\" class=\"input\" [ngClass]=\"classes\" /></div>\n    <div><textarea class=\"textarea\" [ngClass]=\"classes\"></textarea></div>`,\n  styleUrls: ['./input.scss'],\n})\nexport default class InputComponent {\n  /**\n   * Classes\n   *\n   * @required\n   */\n  @Input()\n  classes: string[] = [];\n}\n",
+            "assetsDirs": [],
+            "styleUrlsData": [
+                {
+                    "data": "@import '../../assets/styles/index';\n\ndiv {\n  margin-bottom: 10px;\n}\n",
+                    "styleUrl": "./input.scss"
+                }
+            ],
+            "stylesData": ""
+        },
+        {
+            "name": "TagsComponent",
+            "id": "component-TagsComponent-899e32603a8b654cc98d48f9f21e1373",
+            "file": "src/stories/tags/tags.component.ts",
+            "encapsulation": [],
+            "entryComponents": [],
+            "inputs": [],
+            "outputs": [],
+            "providers": [],
+            "selector": "storybook-tags",
+            "styleUrls": [
+                "./tags.scss"
+            ],
+            "styles": [],
+            "template": "<tag-input [(ngModel)]=\"data\" [ngClass]=\"classes\"></tag-input>",
+            "templateUrl": [],
+            "viewProviders": [],
+            "inputsClass": [
+                {
+                    "name": "classes",
+                    "defaultValue": "[]",
+                    "description": "<p>Classes</p>\n",
+                    "line": 23,
+                    "type": "string[]"
+                },
+                {
+                    "name": "data",
+                    "defaultValue": "['Tag 1']",
+                    "description": "<p>Data</p>\n",
+                    "line": 15
+                }
+            ],
+            "outputsClass": [],
+            "propertiesClass": [],
+            "methodsClass": [],
+            "hostBindings": [],
+            "hostListeners": [],
+            "description": "",
+            "rawdescription": "",
+            "type": "component",
+            "sourceCode": "import { Component, Input } from '@angular/core';\n\n@Component({\n  selector: 'storybook-tags',\n  template: `<tag-input [(ngModel)]=\"data\" [ngClass]=\"classes\"></tag-input>`,\n  styleUrls: ['./tags.scss'],\n})\nexport default class TagsComponent {\n  /**\n   * Data\n   *\n   * @required\n   */\n  @Input()\n  data = ['Tag 1'];\n\n  /**\n   * Classes\n   *\n   * @required\n   */\n  @Input()\n  classes: string[] = [];\n}\n",
+            "assetsDirs": [],
+            "styleUrlsData": [
+                {
+                    "data": "@import '../../assets/styles/index';\n",
+                    "styleUrl": "./tags.scss"
+                }
+            ],
+            "stylesData": ""
+        }
+    ],
+    "modules": [
+        {
+            "name": "AppModule",
+            "children": [
+                {
+                    "type": "providers",
+                    "elements": []
+                },
+                {
+                    "type": "declarations",
+                    "elements": [
+                        {
+                            "name": "AppComponent"
+                        }
+                    ]
+                },
+                {
+                    "type": "imports",
+                    "elements": [
+                        {
+                            "name": "AppRoutingModule"
+                        }
+                    ]
+                },
+                {
+                    "type": "exports",
+                    "elements": []
+                },
+                {
+                    "type": "bootstrap",
+                    "elements": [
+                        {
+                            "name": "AppComponent"
+                        }
+                    ]
+                },
+                {
+                    "type": "classes",
+                    "elements": []
+                }
+            ]
+        },
+        {
+            "name": "AppRoutingModule",
+            "children": [
+                {
+                    "type": "providers",
+                    "elements": []
+                },
+                {
+                    "type": "declarations",
+                    "elements": []
+                },
+                {
+                    "type": "imports",
+                    "elements": []
+                },
+                {
+                    "type": "exports",
+                    "elements": []
+                },
+                {
+                    "type": "bootstrap",
+                    "elements": []
+                },
+                {
+                    "type": "classes",
+                    "elements": []
+                }
+            ]
+        },
+        {
+            "name": "CommentsModule",
+            "children": [
+                {
+                    "type": "providers",
+                    "elements": [
+                        {
+                            "name": "CommentsHttpService"
+                        },
+                        {
+                            "name": "CommentsService"
+                        }
+                    ]
+                },
+                {
+                    "type": "declarations",
+                    "elements": [
+                        {
+                            "name": "AddCommentComponent"
+                        },
+                        {
+                            "name": "CommentComponent"
+                        },
+                        {
+                            "name": "CommentsComponent"
+                        },
+                        {
+                            "name": "CommentsFilterComponent"
+                        }
+                    ]
+                },
+                {
+                    "type": "imports",
+                    "elements": [
+                        {
+                            "name": "CommentsRoutingModule"
+                        },
+                        {
+                            "name": "EvaluateMathExpressionsModule"
+                        }
+                    ]
+                },
+                {
+                    "type": "exports",
+                    "elements": []
+                },
+                {
+                    "type": "bootstrap",
+                    "elements": []
+                },
+                {
+                    "type": "classes",
+                    "elements": []
+                }
+            ]
+        },
+        {
+            "name": "CommentsRoutingModule",
+            "children": [
+                {
+                    "type": "providers",
+                    "elements": []
+                },
+                {
+                    "type": "declarations",
+                    "elements": []
+                },
+                {
+                    "type": "imports",
+                    "elements": []
+                },
+                {
+                    "type": "exports",
+                    "elements": []
+                },
+                {
+                    "type": "bootstrap",
+                    "elements": []
+                },
+                {
+                    "type": "classes",
+                    "elements": []
+                }
+            ]
+        },
+        {
+            "name": "EvaluateMathExpressionsModule",
+            "children": [
+                {
+                    "type": "providers",
+                    "elements": []
+                },
+                {
+                    "type": "declarations",
+                    "elements": [
+                        {
+                            "name": "EvaluateMathExpressionsPipe"
+                        }
+                    ]
+                },
+                {
+                    "type": "imports",
+                    "elements": []
+                },
+                {
+                    "type": "exports",
+                    "elements": [
+                        {
+                            "name": "EvaluateMathExpressionsPipe"
+                        }
+                    ]
+                },
+                {
+                    "type": "bootstrap",
+                    "elements": []
+                },
+                {
+                    "type": "classes",
+                    "elements": []
+                }
+            ]
+        }
+    ],
+    "miscellaneous": {
+        "variables": [
+            {
+                "name": "AddComment",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/comment/Comment.stories.ts",
+                "type": "",
+                "defaultValue": "AddCommentTemplate.bind({})"
+            },
+            {
+                "name": "AddCommentTemplate",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/comment/Comment.stories.ts",
+                "type": "Story<AddCommentComponent>",
+                "defaultValue": "(args: AddCommentComponent) =>\n  ({\n    component: AddCommentComponent,\n    props: args,\n    moduleMetadata: {\n      imports: [\n        CommonModule,\n        TagInputModule,\n        FormsModule,\n        BrowserAnimationsModule,\n        ReactiveFormsModule,\n        EvaluateMathExpressionsModule,\n        NgxErrorMessageModule,\n        TranslateModule.forRoot(),\n      ],\n    },\n  } as StoryFnAngularReturnType)"
+            },
+            {
+                "name": "comment",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/comment/Comment.stories.ts",
+                "type": "",
+                "defaultValue": "{\n  id: 1,\n  text: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',\n  title: 'Topic',\n  tags: ['Tag 1'],\n} as Comment"
+            },
+            {
+                "name": "COMMENT_TEXT_VALIDATORS",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/comments/models.ts",
+                "type": "[]",
+                "defaultValue": "[Validators.required, Validators.minLength(2), Validators.maxLength(1000)]"
+            },
+            {
+                "name": "COMMENT_TITLE_VALIDATORS",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/comments/models.ts",
+                "type": "[]",
+                "defaultValue": "[Validators.required, Validators.minLength(2), Validators.maxLength(100)]"
+            },
+            {
+                "name": "COMMENTS",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/testing/mock-data.ts",
+                "type": "",
+                "defaultValue": "[\n  { id: 1, title: 'Title 1', text: 'Text 1', tags: ['Tag 1'] },\n  { id: 2, title: 'Title 2', text: 'Text 2', tags: [] },\n] as Comment[]"
+            },
+            {
+                "name": "Danger",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/button/Button.stories.ts",
+                "type": "",
+                "defaultValue": "Template.bind({})"
+            },
+            {
+                "name": "DangerOutline",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/button/Button.stories.ts",
+                "type": "",
+                "defaultValue": "Template.bind({})"
+            },
+            {
+                "name": "Default",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/button/Button.stories.ts",
+                "type": "",
+                "defaultValue": "Template.bind({})"
+            },
+            {
+                "name": "Default",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/input/Input.stories.ts",
+                "type": "",
+                "defaultValue": "Template.bind({})"
+            },
+            {
+                "name": "DEFAULT_OPERATORS",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/common/html-expression-pipe/evaluate-math-expressions.ts",
+                "type": "",
+                "defaultValue": "{\n  '+': (a, b) => a + b,\n  '-': (a, b) => a - b,\n  '*': (a, b) => a * b,\n  '/': (a, b) => a / b,\n} as Operators"
+            },
+            {
+                "name": "Editable",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/comment/Comment.stories.ts",
+                "type": "",
+                "defaultValue": "Template.bind({})"
+            },
+            {
+                "name": "Editable",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/tags/Tags.stories.ts",
+                "type": "",
+                "defaultValue": "Template.bind({})"
+            },
+            {
+                "name": "environment",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/environments/environment.prod.ts",
+                "type": "object",
+                "defaultValue": "{\n  production: true,\n}"
+            },
+            {
+                "name": "environment",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/environments/environment.ts",
+                "type": "object",
+                "defaultValue": "{\n  production: false,\n}"
+            },
+            {
+                "name": "Gray",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/input/Input.stories.ts",
+                "type": "",
+                "defaultValue": "Template.bind({})"
+            },
+            {
+                "name": "Large",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/button/Button.stories.ts",
+                "type": "",
+                "defaultValue": "Template.bind({})"
+            },
+            {
+                "name": "Medium",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/button/Button.stories.ts",
+                "type": "",
+                "defaultValue": "Template.bind({})"
+            },
+            {
+                "name": "Outline",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/button/Button.stories.ts",
+                "type": "",
+                "defaultValue": "Template.bind({})"
+            },
+            {
+                "name": "Primary",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/button/Button.stories.ts",
+                "type": "",
+                "defaultValue": "Template.bind({})"
+            },
+            {
+                "name": "Readonly",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/comment/Comment.stories.ts",
+                "type": "",
+                "defaultValue": "Template.bind({})"
+            },
+            {
+                "name": "Readonly",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/tags/Tags.stories.ts",
+                "type": "",
+                "defaultValue": "Template.bind({})"
+            },
+            {
+                "name": "Secondary",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/button/Button.stories.ts",
+                "type": "",
+                "defaultValue": "Template.bind({})"
+            },
+            {
+                "name": "Small",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/button/Button.stories.ts",
+                "type": "",
+                "defaultValue": "Template.bind({})"
+            },
+            {
+                "name": "TAGS",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/testing/mock-data.ts",
+                "type": "[]",
+                "defaultValue": "['Tag 1']"
+            },
+            {
+                "name": "Template",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/button/Button.stories.ts",
+                "type": "Story<Button>",
+                "defaultValue": "(args: Button) => ({\n  component: Button,\n  props: args,\n})"
+            },
+            {
+                "name": "Template",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/comment/Comment.stories.ts",
+                "type": "Story<CommentComponent>",
+                "defaultValue": "(args: CommentComponent) =>\n  ({\n    component: CommentComponent,\n    props: args,\n    moduleMetadata: {\n      imports: [\n        CommonModule,\n        TagInputModule,\n        FormsModule,\n        BrowserAnimationsModule,\n        ReactiveFormsModule,\n        EvaluateMathExpressionsModule,\n        NgxErrorMessageModule,\n        TranslateModule.forRoot(),\n      ],\n    },\n  } as StoryFnAngularReturnType)"
+            },
+            {
+                "name": "Template",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/tags/Tags.stories.ts",
+                "type": "Story<TagsComponent>",
+                "defaultValue": "(args: TagsComponent) =>\n  ({\n    component: TagsComponent,\n    props: args,\n    moduleMetadata: {\n      imports: [CommonModule, TagInputModule, FormsModule, BrowserAnimationsModule],\n    },\n  } as StoryFnAngularReturnType)"
+            },
+            {
+                "name": "Template",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/stories/input/Input.stories.ts",
+                "type": "Story<InputComponent>",
+                "defaultValue": "(args: InputComponent) => ({\n  component: InputComponent,\n  props: args,\n})"
+            }
+        ],
+        "functions": [
+            {
+                "name": "addNewTagItem",
+                "file": "src/testing/test-utils.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "description": "",
+                "args": [
+                    {
+                        "name": "spectator"
+                    },
+                    {
+                        "name": "text"
+                    },
+                    {
+                        "name": "parentSelector"
+                    }
+                ],
+                "jsdoctags": [
+                    {
+                        "name": "spectator",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "text",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "parentSelector",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "calculate",
+                "file": "src/app/common/html-expression-pipe/evaluate-math-expressions.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "description": "",
+                "args": [
+                    {
+                        "name": "text"
+                    },
+                    {
+                        "name": "operators"
+                    }
+                ],
+                "returnType": "number",
+                "jsdoctags": [
+                    {
+                        "name": "text",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "operators",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "deepClone",
+                "file": "src/app/common/utils/utils.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "description": "",
+                "args": [
+                    {
+                        "name": "value"
+                    }
+                ],
+                "returnType": "T",
+                "jsdoctags": [
+                    {
+                        "name": "value",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "evaluateMathExpressions",
+                "file": "src/app/common/html-expression-pipe/evaluate-math-expressions.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "description": "",
+                "args": [
+                    {
+                        "name": "text"
+                    },
+                    {
+                        "name": "operators",
+                        "type": ""
+                    }
+                ],
+                "jsdoctags": [
+                    {
+                        "name": "text",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "operators",
+                        "type": "",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "expectMarble",
+                "file": "src/testing/test-utils-marble.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "description": "",
+                "args": [
+                    {
+                        "name": "cb"
+                    },
+                    {
+                        "name": "marble"
+                    },
+                    {
+                        "name": "values",
+                        "optional": true
+                    },
+                    {
+                        "name": "error",
+                        "optional": true
+                    }
+                ],
+                "returnType": "void",
+                "jsdoctags": [
+                    {
+                        "name": "cb",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "marble",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "values",
+                        "optional": true,
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "error",
+                        "optional": true,
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "filterCommentsByTags",
+                "file": "src/app/comments/comments.service.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "description": "",
+                "args": [
+                    {}
+                ],
+                "jsdoctags": [
+                    {
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "getCommentTags",
+                "file": "src/app/comments/comments.service.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "description": "",
+                "args": [
+                    {
+                        "name": "comments"
+                    }
+                ],
+                "jsdoctags": [
+                    {
+                        "name": "comments",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "getControl",
+                "file": "src/testing/test-utils.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "description": "",
+                "args": [
+                    {
+                        "name": "spectator"
+                    },
+                    {
+                        "name": "name"
+                    }
+                ],
+                "jsdoctags": [
+                    {
+                        "name": "spectator",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "getNearestInputError",
+                "file": "src/testing/test-utils.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "description": "",
+                "args": [
+                    {
+                        "name": "spectator"
+                    },
+                    {
+                        "name": "name"
+                    }
+                ],
+                "jsdoctags": [
+                    {
+                        "name": "spectator",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "HttpLoaderFactory",
+                "file": "src/app/app.module.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "description": "",
+                "args": [
+                    {
+                        "name": "http"
+                    }
+                ],
+                "jsdoctags": [
+                    {
+                        "name": "http",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "operatorsRegExp",
+                "file": "src/app/common/html-expression-pipe/evaluate-math-expressions.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "description": "",
+                "args": [
+                    {
+                        "name": "operators"
+                    }
+                ],
+                "jsdoctags": [
+                    {
+                        "name": "operators",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "removeDuplicates",
+                "file": "src/app/common/utils/utils.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "description": "",
+                "args": [
+                    {
+                        "name": "arr"
+                    }
+                ],
+                "returnType": "T[]",
+                "jsdoctags": [
+                    {
+                        "name": "arr",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            },
+            {
+                "name": "typeInControl",
+                "file": "src/testing/test-utils.ts",
+                "ctype": "miscellaneous",
+                "subtype": "function",
+                "description": "",
+                "args": [
+                    {
+                        "name": "spectator"
+                    },
+                    {
+                        "name": "name"
+                    },
+                    {
+                        "name": "text"
+                    }
+                ],
+                "jsdoctags": [
+                    {
+                        "name": "spectator",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    },
+                    {
+                        "name": "text",
+                        "tagName": {
+                            "text": "param"
+                        }
+                    }
+                ]
+            }
+        ],
+        "typealiases": [
+            {
+                "name": "OperatorResolver",
+                "ctype": "miscellaneous",
+                "subtype": "typealias",
+                "rawtype": "function",
+                "file": "src/app/common/html-expression-pipe/evaluate-math-expressions.ts",
+                "description": "",
+                "kind": 162
+            }
+        ],
+        "enumerations": [],
+        "groupedVariables": {
+            "src/stories/comment/Comment.stories.ts": [
+                {
+                    "name": "AddComment",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/comment/Comment.stories.ts",
+                    "type": "",
+                    "defaultValue": "AddCommentTemplate.bind({})"
+                },
+                {
+                    "name": "AddCommentTemplate",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/comment/Comment.stories.ts",
+                    "type": "Story<AddCommentComponent>",
+                    "defaultValue": "(args: AddCommentComponent) =>\n  ({\n    component: AddCommentComponent,\n    props: args,\n    moduleMetadata: {\n      imports: [\n        CommonModule,\n        TagInputModule,\n        FormsModule,\n        BrowserAnimationsModule,\n        ReactiveFormsModule,\n        EvaluateMathExpressionsModule,\n        NgxErrorMessageModule,\n        TranslateModule.forRoot(),\n      ],\n    },\n  } as StoryFnAngularReturnType)"
+                },
+                {
+                    "name": "comment",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/comment/Comment.stories.ts",
+                    "type": "",
+                    "defaultValue": "{\n  id: 1,\n  text: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',\n  title: 'Topic',\n  tags: ['Tag 1'],\n} as Comment"
+                },
+                {
+                    "name": "Editable",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/comment/Comment.stories.ts",
+                    "type": "",
+                    "defaultValue": "Template.bind({})"
+                },
+                {
+                    "name": "Readonly",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/comment/Comment.stories.ts",
+                    "type": "",
+                    "defaultValue": "Template.bind({})"
+                },
+                {
+                    "name": "Template",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/comment/Comment.stories.ts",
+                    "type": "Story<CommentComponent>",
+                    "defaultValue": "(args: CommentComponent) =>\n  ({\n    component: CommentComponent,\n    props: args,\n    moduleMetadata: {\n      imports: [\n        CommonModule,\n        TagInputModule,\n        FormsModule,\n        BrowserAnimationsModule,\n        ReactiveFormsModule,\n        EvaluateMathExpressionsModule,\n        NgxErrorMessageModule,\n        TranslateModule.forRoot(),\n      ],\n    },\n  } as StoryFnAngularReturnType)"
+                }
+            ],
+            "src/app/comments/models.ts": [
+                {
+                    "name": "COMMENT_TEXT_VALIDATORS",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/comments/models.ts",
+                    "type": "[]",
+                    "defaultValue": "[Validators.required, Validators.minLength(2), Validators.maxLength(1000)]"
+                },
+                {
+                    "name": "COMMENT_TITLE_VALIDATORS",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/comments/models.ts",
+                    "type": "[]",
+                    "defaultValue": "[Validators.required, Validators.minLength(2), Validators.maxLength(100)]"
+                }
+            ],
+            "src/testing/mock-data.ts": [
+                {
+                    "name": "COMMENTS",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/testing/mock-data.ts",
+                    "type": "",
+                    "defaultValue": "[\n  { id: 1, title: 'Title 1', text: 'Text 1', tags: ['Tag 1'] },\n  { id: 2, title: 'Title 2', text: 'Text 2', tags: [] },\n] as Comment[]"
+                },
+                {
+                    "name": "TAGS",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/testing/mock-data.ts",
+                    "type": "[]",
+                    "defaultValue": "['Tag 1']"
+                }
+            ],
+            "src/stories/button/Button.stories.ts": [
+                {
+                    "name": "Danger",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/button/Button.stories.ts",
+                    "type": "",
+                    "defaultValue": "Template.bind({})"
+                },
+                {
+                    "name": "DangerOutline",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/button/Button.stories.ts",
+                    "type": "",
+                    "defaultValue": "Template.bind({})"
+                },
+                {
+                    "name": "Default",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/button/Button.stories.ts",
+                    "type": "",
+                    "defaultValue": "Template.bind({})"
+                },
+                {
+                    "name": "Large",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/button/Button.stories.ts",
+                    "type": "",
+                    "defaultValue": "Template.bind({})"
+                },
+                {
+                    "name": "Medium",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/button/Button.stories.ts",
+                    "type": "",
+                    "defaultValue": "Template.bind({})"
+                },
+                {
+                    "name": "Outline",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/button/Button.stories.ts",
+                    "type": "",
+                    "defaultValue": "Template.bind({})"
+                },
+                {
+                    "name": "Primary",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/button/Button.stories.ts",
+                    "type": "",
+                    "defaultValue": "Template.bind({})"
+                },
+                {
+                    "name": "Secondary",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/button/Button.stories.ts",
+                    "type": "",
+                    "defaultValue": "Template.bind({})"
+                },
+                {
+                    "name": "Small",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/button/Button.stories.ts",
+                    "type": "",
+                    "defaultValue": "Template.bind({})"
+                },
+                {
+                    "name": "Template",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/button/Button.stories.ts",
+                    "type": "Story<Button>",
+                    "defaultValue": "(args: Button) => ({\n  component: Button,\n  props: args,\n})"
+                }
+            ],
+            "src/stories/input/Input.stories.ts": [
+                {
+                    "name": "Default",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/input/Input.stories.ts",
+                    "type": "",
+                    "defaultValue": "Template.bind({})"
+                },
+                {
+                    "name": "Gray",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/input/Input.stories.ts",
+                    "type": "",
+                    "defaultValue": "Template.bind({})"
+                },
+                {
+                    "name": "Template",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/input/Input.stories.ts",
+                    "type": "Story<InputComponent>",
+                    "defaultValue": "(args: InputComponent) => ({\n  component: InputComponent,\n  props: args,\n})"
+                }
+            ],
+            "src/app/common/html-expression-pipe/evaluate-math-expressions.ts": [
+                {
+                    "name": "DEFAULT_OPERATORS",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/common/html-expression-pipe/evaluate-math-expressions.ts",
+                    "type": "",
+                    "defaultValue": "{\n  '+': (a, b) => a + b,\n  '-': (a, b) => a - b,\n  '*': (a, b) => a * b,\n  '/': (a, b) => a / b,\n} as Operators"
+                }
+            ],
+            "src/stories/tags/Tags.stories.ts": [
+                {
+                    "name": "Editable",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/tags/Tags.stories.ts",
+                    "type": "",
+                    "defaultValue": "Template.bind({})"
+                },
+                {
+                    "name": "Readonly",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/tags/Tags.stories.ts",
+                    "type": "",
+                    "defaultValue": "Template.bind({})"
+                },
+                {
+                    "name": "Template",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/stories/tags/Tags.stories.ts",
+                    "type": "Story<TagsComponent>",
+                    "defaultValue": "(args: TagsComponent) =>\n  ({\n    component: TagsComponent,\n    props: args,\n    moduleMetadata: {\n      imports: [CommonModule, TagInputModule, FormsModule, BrowserAnimationsModule],\n    },\n  } as StoryFnAngularReturnType)"
+                }
+            ],
+            "src/environments/environment.prod.ts": [
+                {
+                    "name": "environment",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/environments/environment.prod.ts",
+                    "type": "object",
+                    "defaultValue": "{\n  production: true,\n}"
+                }
+            ],
+            "src/environments/environment.ts": [
+                {
+                    "name": "environment",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/environments/environment.ts",
+                    "type": "object",
+                    "defaultValue": "{\n  production: false,\n}"
+                }
+            ]
+        },
+        "groupedFunctions": {
+            "src/testing/test-utils.ts": [
+                {
+                    "name": "addNewTagItem",
+                    "file": "src/testing/test-utils.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "description": "",
+                    "args": [
+                        {
+                            "name": "spectator"
+                        },
+                        {
+                            "name": "text"
+                        },
+                        {
+                            "name": "parentSelector"
+                        }
+                    ],
+                    "jsdoctags": [
+                        {
+                            "name": "spectator",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        },
+                        {
+                            "name": "text",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        },
+                        {
+                            "name": "parentSelector",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "getControl",
+                    "file": "src/testing/test-utils.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "description": "",
+                    "args": [
+                        {
+                            "name": "spectator"
+                        },
+                        {
+                            "name": "name"
+                        }
+                    ],
+                    "jsdoctags": [
+                        {
+                            "name": "spectator",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        },
+                        {
+                            "name": "name",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "getNearestInputError",
+                    "file": "src/testing/test-utils.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "description": "",
+                    "args": [
+                        {
+                            "name": "spectator"
+                        },
+                        {
+                            "name": "name"
+                        }
+                    ],
+                    "jsdoctags": [
+                        {
+                            "name": "spectator",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        },
+                        {
+                            "name": "name",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "typeInControl",
+                    "file": "src/testing/test-utils.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "description": "",
+                    "args": [
+                        {
+                            "name": "spectator"
+                        },
+                        {
+                            "name": "name"
+                        },
+                        {
+                            "name": "text"
+                        }
+                    ],
+                    "jsdoctags": [
+                        {
+                            "name": "spectator",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        },
+                        {
+                            "name": "name",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        },
+                        {
+                            "name": "text",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "src/app/common/html-expression-pipe/evaluate-math-expressions.ts": [
+                {
+                    "name": "calculate",
+                    "file": "src/app/common/html-expression-pipe/evaluate-math-expressions.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "description": "",
+                    "args": [
+                        {
+                            "name": "text"
+                        },
+                        {
+                            "name": "operators"
+                        }
+                    ],
+                    "returnType": "number",
+                    "jsdoctags": [
+                        {
+                            "name": "text",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        },
+                        {
+                            "name": "operators",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "evaluateMathExpressions",
+                    "file": "src/app/common/html-expression-pipe/evaluate-math-expressions.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "description": "",
+                    "args": [
+                        {
+                            "name": "text"
+                        },
+                        {
+                            "name": "operators",
+                            "type": ""
+                        }
+                    ],
+                    "jsdoctags": [
+                        {
+                            "name": "text",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        },
+                        {
+                            "name": "operators",
+                            "type": "",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "operatorsRegExp",
+                    "file": "src/app/common/html-expression-pipe/evaluate-math-expressions.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "description": "",
+                    "args": [
+                        {
+                            "name": "operators"
+                        }
+                    ],
+                    "jsdoctags": [
+                        {
+                            "name": "operators",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "src/app/common/utils/utils.ts": [
+                {
+                    "name": "deepClone",
+                    "file": "src/app/common/utils/utils.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "description": "",
+                    "args": [
+                        {
+                            "name": "value"
+                        }
+                    ],
+                    "returnType": "T",
+                    "jsdoctags": [
+                        {
+                            "name": "value",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "removeDuplicates",
+                    "file": "src/app/common/utils/utils.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "description": "",
+                    "args": [
+                        {
+                            "name": "arr"
+                        }
+                    ],
+                    "returnType": "T[]",
+                    "jsdoctags": [
+                        {
+                            "name": "arr",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "src/testing/test-utils-marble.ts": [
+                {
+                    "name": "expectMarble",
+                    "file": "src/testing/test-utils-marble.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "description": "",
+                    "args": [
+                        {
+                            "name": "cb"
+                        },
+                        {
+                            "name": "marble"
+                        },
+                        {
+                            "name": "values",
+                            "optional": true
+                        },
+                        {
+                            "name": "error",
+                            "optional": true
+                        }
+                    ],
+                    "returnType": "void",
+                    "jsdoctags": [
+                        {
+                            "name": "cb",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        },
+                        {
+                            "name": "marble",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        },
+                        {
+                            "name": "values",
+                            "optional": true,
+                            "tagName": {
+                                "text": "param"
+                            }
+                        },
+                        {
+                            "name": "error",
+                            "optional": true,
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "src/app/comments/comments.service.ts": [
+                {
+                    "name": "filterCommentsByTags",
+                    "file": "src/app/comments/comments.service.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "description": "",
+                    "args": [
+                        {}
+                    ],
+                    "jsdoctags": [
+                        {
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "getCommentTags",
+                    "file": "src/app/comments/comments.service.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "description": "",
+                    "args": [
+                        {
+                            "name": "comments"
+                        }
+                    ],
+                    "jsdoctags": [
+                        {
+                            "name": "comments",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "src/app/app.module.ts": [
+                {
+                    "name": "HttpLoaderFactory",
+                    "file": "src/app/app.module.ts",
+                    "ctype": "miscellaneous",
+                    "subtype": "function",
+                    "description": "",
+                    "args": [
+                        {
+                            "name": "http"
+                        }
+                    ],
+                    "jsdoctags": [
+                        {
+                            "name": "http",
+                            "tagName": {
+                                "text": "param"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "groupedEnumerations": {},
+        "groupedTypeAliases": {
+            "src/app/common/html-expression-pipe/evaluate-math-expressions.ts": [
+                {
+                    "name": "OperatorResolver",
+                    "ctype": "miscellaneous",
+                    "subtype": "typealias",
+                    "rawtype": "function",
+                    "file": "src/app/common/html-expression-pipe/evaluate-math-expressions.ts",
+                    "description": "",
+                    "kind": 162
+                }
+            ]
+        }
+    },
+    "routes": {
+        "name": "<root>",
+        "kind": "module",
+        "className": "AppModule",
+        "children": [
+            {
+                "name": "routes",
+                "filename": "src/app/app-routing.module.ts",
+                "module": "AppRoutingModule",
+                "kind": "module"
+            }
+        ]
+    },
+    "coverage": {
+        "count": 2,
+        "status": "low",
+        "files": [
+            {
+                "filePath": "src/app/app.component.ts",
+                "type": "component",
+                "linktype": "component",
+                "name": "AppComponent",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/app.module.ts",
+                "type": "function",
+                "linksubtype": "function",
+                "name": "HttpLoaderFactory",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/comments/add-comment/add-comment.component.ts",
+                "type": "component",
+                "linktype": "component",
+                "name": "AddCommentComponent",
+                "coveragePercent": 0,
+                "coverageCount": "0/9",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/comments/comment/comment.component.ts",
+                "type": "component",
+                "linktype": "component",
+                "name": "CommentComponent",
+                "coveragePercent": 0,
+                "coverageCount": "0/12",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/comments/comments-filter/comments-filter.component.ts",
+                "type": "component",
+                "linktype": "component",
+                "name": "CommentsFilterComponent",
+                "coveragePercent": 0,
+                "coverageCount": "0/4",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/comments/comments-http.service.ts",
+                "type": "injectable",
+                "linktype": "injectable",
+                "name": "CommentsHttpService",
+                "coveragePercent": 0,
+                "coverageCount": "0/6",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/comments/comments.service.ts",
+                "type": "injectable",
+                "linktype": "injectable",
+                "name": "CommentsService",
+                "coveragePercent": 0,
+                "coverageCount": "0/11",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/comments/comments.service.ts",
+                "type": "function",
+                "linksubtype": "function",
+                "name": "filterCommentsByTags",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/comments/comments.service.ts",
+                "type": "function",
+                "linksubtype": "function",
+                "name": "getCommentTags",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/comments/comments/comments.component.ts",
+                "type": "component",
+                "linktype": "component",
+                "name": "CommentsComponent",
+                "coveragePercent": 0,
+                "coverageCount": "0/5",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/comments/models.ts",
+                "type": "interface",
+                "linktype": "interface",
+                "name": "Comment",
+                "coveragePercent": 0,
+                "coverageCount": "0/5",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/comments/models.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "COMMENT_TEXT_VALIDATORS",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/comments/models.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "COMMENT_TITLE_VALIDATORS",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/common/html-expression-pipe/evaluate-math-expressions.pipe.ts",
+                "type": "pipe",
+                "linktype": "pipe",
+                "name": "EvaluateMathExpressionsPipe",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/common/html-expression-pipe/evaluate-math-expressions.ts",
+                "type": "interface",
+                "linktype": "interface",
+                "name": "Operators",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/common/html-expression-pipe/evaluate-math-expressions.ts",
+                "type": "function",
+                "linksubtype": "function",
+                "name": "calculate",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/common/html-expression-pipe/evaluate-math-expressions.ts",
+                "type": "function",
+                "linksubtype": "function",
+                "name": "evaluateMathExpressions",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/common/html-expression-pipe/evaluate-math-expressions.ts",
+                "type": "function",
+                "linksubtype": "function",
+                "name": "operatorsRegExp",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/common/html-expression-pipe/evaluate-math-expressions.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "DEFAULT_OPERATORS",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/common/utils/utils.ts",
+                "type": "function",
+                "linksubtype": "function",
+                "name": "deepClone",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/common/utils/utils.ts",
+                "type": "function",
+                "linksubtype": "function",
+                "name": "removeDuplicates",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/environments/environment.prod.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "environment",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/environments/environment.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "environment",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/button/Button.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Danger",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/button/Button.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "DangerOutline",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/button/Button.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Default",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/button/Button.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Large",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/button/Button.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Medium",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/button/Button.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Outline",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/button/Button.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Primary",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/button/Button.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Secondary",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/button/Button.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Small",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/button/Button.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Template",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/button/button.component.ts",
+                "type": "component",
+                "linktype": "component",
+                "name": "ButtonComponent",
+                "coveragePercent": 50,
+                "coverageCount": "1/2",
+                "status": "medium"
+            },
+            {
+                "filePath": "src/stories/comment/Comment.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "AddComment",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/comment/Comment.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "AddCommentTemplate",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/comment/Comment.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "comment",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/comment/Comment.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Editable",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/comment/Comment.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Readonly",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/comment/Comment.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Template",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/input/Input.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Default",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/input/Input.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Gray",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/input/Input.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Template",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/input/input.component.ts",
+                "type": "component",
+                "linktype": "component",
+                "name": "InputComponent",
+                "coveragePercent": 50,
+                "coverageCount": "1/2",
+                "status": "medium"
+            },
+            {
+                "filePath": "src/stories/tags/Tags.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Editable",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/tags/Tags.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Readonly",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/tags/Tags.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Template",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/stories/tags/tags.component.ts",
+                "type": "component",
+                "linktype": "component",
+                "name": "TagsComponent",
+                "coveragePercent": 66,
+                "coverageCount": "2/3",
+                "status": "good"
+            },
+            {
+                "filePath": "src/testing/mock-data.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "COMMENTS",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/testing/mock-data.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "TAGS",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/testing/test-utils-marble.ts",
+                "type": "interface",
+                "linktype": "interface",
+                "name": "CustomRunHelpers",
+                "coveragePercent": 0,
+                "coverageCount": "0/2",
+                "status": "low"
+            },
+            {
+                "filePath": "src/testing/test-utils-marble.ts",
+                "type": "function",
+                "linksubtype": "function",
+                "name": "expectMarble",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/testing/test-utils.ts",
+                "type": "function",
+                "linksubtype": "function",
+                "name": "addNewTagItem",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/testing/test-utils.ts",
+                "type": "function",
+                "linksubtype": "function",
+                "name": "getControl",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/testing/test-utils.ts",
+                "type": "function",
+                "linksubtype": "function",
+                "name": "getNearestInputError",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/testing/test-utils.ts",
+                "type": "function",
+                "linksubtype": "function",
+                "name": "typeInControl",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            }
+        ]
+    }
+}

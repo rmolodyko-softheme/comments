@@ -1,0 +1,62 @@
+:host {
+  display: block;
+  margin: auto;
+  margin-top: 30px;
+  border: 1px solid #e6e6e6;
+  border-radius: 5px;
+  background: #f9f9f9;
+  max-width: var(--comment-width);
+}
+
+.add-comment {
+  --input-margin: 20px;
+
+  padding: 20px;
+
+  &__text {
+    margin-top: var(--input-margin);
+  }
+
+  &__tag {
+    margin-top: var(--input-margin);
+
+    ::ng-deep input {
+      border: 1px solid #e1e4e8;
+      border-radius: 6px;
+      outline: none;
+      box-shadow: 0 0 0 1px rgba(225, 228, 232, 0.2);
+      height: 31px;
+    }
+  }
+
+  &__controls {
+    margin-top: var(--input-margin);
+    text-align: right;
+
+    button {
+      margin-left: 10px;
+    }
+  }
+
+  &__show-preview {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+
+    color: #757575;
+    font: 400 13px/20px Roboto, 'Helvetica Neue', sans-serif;
+    letter-spacing: normal;
+    line-height: 1.5;
+
+    input {
+      margin-right: 10px;
+    }
+  }
+
+  &__preview {
+    margin: 10px 0;
+    border: 1px solid #c5c5c5;
+    border-radius: 3px;
+    padding: 10px;
+  }
+}

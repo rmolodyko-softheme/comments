@@ -1,0 +1,16 @@
+<div class="comments-filter">
+  <tag-input
+    class="tag comments-filter__tag"
+    [modelAsStrings]="true"
+    [onlyFromAutocomplete]="true"
+    (ngModelChange)="filterChanged.emit($event)"
+    [formControl]="_control"
+    [secondaryPlaceholder]="'Find comments by tags'"
+  >
+    <tag-input-dropdown [showDropdownIfEmpty]="true" [limitItemsTo]="20" [autocompleteItems]="availableTags">
+      <ng-template let-item="item" let-index="index"
+        ><span class="comments-filter__autocomplete-item">{{ item.display }}</span></ng-template
+      >
+    </tag-input-dropdown>
+  </tag-input>
+</div>

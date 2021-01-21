@@ -1,0 +1,40 @@
+.textarea,
+.input {
+  font: 400 14px/20px Roboto, 'Helvetica Neue', sans-serif;
+  letter-spacing: normal;
+  line-height: 1.5;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-color: white;
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(225, 228, 232, 0.2);
+
+  &:focus {
+    background-color: white;
+    border-color: #0366d6;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.3);
+  }
+
+  &.gray {
+    background-color: #fafbfc;
+  }
+}
+
+.textarea {
+  max-height: 279px;
+  height: 98px;
+  padding: 8px;
+  min-height: 100px;
+  resize: vertical;
+}
+
+.input {
+  height: 35px;
+  padding: 10px;
+}

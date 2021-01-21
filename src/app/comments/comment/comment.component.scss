@@ -1,0 +1,59 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.comment {
+  width: 100%;
+  display: block;
+  margin-bottom: 25px;
+  border-radius: var(--list-border-radius);
+  border: 1px solid #eee;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 16px;
+    background: #f6f8fa;
+    border-radius: var(--list-border-radius) var(--list-border-radius) 0 0;
+  }
+
+  &__name {
+    font-weight: 500;
+    width: 100%;
+    margin-right: 10px;
+
+    ::ng-deep .input + ngx-error-message {
+      position: absolute;
+      margin-top: -3px;
+    }
+  }
+
+  &_editable .comment__name {
+    font-weight: normal;
+  }
+
+  &__content {
+    padding: 15px;
+
+    ::ng-deep .textarea + ngx-error-message {
+      position: absolute;
+      margin-top: -3px;
+    }
+  }
+
+  &__controls {
+    display: flex;
+    align-items: center;
+
+    button {
+      margin-left: 5px;
+    }
+  }
+
+  &__tags {
+    padding: 15px;
+  }
+}
