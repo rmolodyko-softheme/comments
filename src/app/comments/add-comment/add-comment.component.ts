@@ -39,6 +39,7 @@ export class AddCommentComponent {
 
   togglePreview() {
 
+
     let a: number;
 
 
