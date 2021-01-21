@@ -10,6 +10,8 @@ import { AddCommentComponent } from '../../app/comments/add-comment/add-comment.
 import { EvaluateMathExpressionsModule } from '../../app/common/html-expression-pipe/evaluate-math-expressions.module';
 import { NgxErrorMessageModule } from 'ngx-error-message';
 import { TranslateModule } from '@ngx-translate/core';
+import { AngularEditorModule } from '@kolkov/angular-editor';
+import { HttpClientModule } from '@angular/common/http';
 
 export default {
   title: 'Example/Comment',
@@ -30,6 +32,8 @@ const Template: Story<CommentComponent> = (args: CommentComponent) =>
         EvaluateMathExpressionsModule,
         NgxErrorMessageModule,
         TranslateModule.forRoot(),
+        HttpClientModule,
+        AngularEditorModule
       ],
     },
   } as StoryFnAngularReturnType);
@@ -67,6 +71,8 @@ const AddCommentTemplate: Story<AddCommentComponent> = (args: AddCommentComponen
         EvaluateMathExpressionsModule,
         NgxErrorMessageModule,
         TranslateModule.forRoot(),
+        HttpClientModule,
+        AngularEditorModule,
       ],
     },
   } as StoryFnAngularReturnType);

@@ -2,19 +2,8 @@
   <input class="input add-comment__title" placeholder="Title" formControlName="title" required />
   <ng-template ngxErrorMessage [control]="_form.get('title')"></ng-template>
 
-  <textarea class="textarea gray add-comment__text" placeholder="Text" formControlName="text" required></textarea>
+  <angular-editor class="add-comment__text" formControlName="text" [config]="{ editable: true }"></angular-editor>
   <ng-template ngxErrorMessage [control]="_form.get('text')"></ng-template>
-
-  <label class="add-comment__show-preview">
-    <input type="checkbox" (click)="togglePreview()" />
-    Show text preview
-  </label>
-
-  <div
-    class="add-comment__preview new-line-to-br"
-    *ngIf="_showPreview"
-    [innerHTML]="_form.get('text').value | evaluateMathExpressions"
-  ></div>
 
   <tag-input class="tag add-comment__tag" formControlName="tags" ngDefaultControl [modelAsStrings]="true">
     <tag-input-dropdown [showDropdownIfEmpty]="true" [autocompleteItems]="availableTags">

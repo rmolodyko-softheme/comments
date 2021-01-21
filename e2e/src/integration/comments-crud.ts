@@ -4,7 +4,7 @@ describe('comments crud', () => {
   it('should be able to add new comment', () => {
     cy.visit('/');
     cy.get('.input.add-comment__title').type('Test title');
-    cy.get('.textarea.add-comment__text').type('Test Text');
+    cy.get('.angular-editor-textarea').type('Test Text');
     cy.get('.add-comment__tag input').type('Tag 1{enter}');
     cy.get('.add-comment__tag input').type('Tag 2{enter}');
     cy.get('.add-comment button[type="submit"]').click({ force: true });

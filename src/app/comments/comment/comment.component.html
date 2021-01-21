@@ -25,11 +25,11 @@
       <div class="new-line-to-br" [innerHTML]="_form.value.text | evaluateMathExpressions"></div>
     </ng-container>
     <ng-template #textEditableContent>
-      <textarea class="textarea" formControlName="text"> </textarea>
+      <angular-editor class="add_comment__text" formControlName="text" [config]="{ editable: true }"></angular-editor>
       <ng-template ngxErrorMessage [control]="_form.get('text')"></ng-template>
     </ng-template>
   </div>
-  <div class="comment__tags" *ngIf="_form.get('tags')?.value?.length > 0">
+  <div class="comment__tags" *ngIf="(_form.get('tags')?.value?.length > 0 && readonly) || !readonly">
     <tag-input [formControl]="_form.get('tags')" class="tag" [class.readonly]="readonly">
       <tag-input-dropdown [showDropdownIfEmpty]="true" [autocompleteItems]="availableTags">
         <ng-template let-item="item" let-index="index">{{ item.display }}</ng-template>

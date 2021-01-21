@@ -7,6 +7,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { getControl, typeInControl } from '../../../testing/test-utils';
 import { COMMENTS } from '../../../testing/mock-data';
 import { EvaluateMathExpressionsModule } from '../../common/html-expression-pipe/evaluate-math-expressions.module';
+import { AngularEditorModule } from '@kolkov/angular-editor';
+import { HttpClientModule } from '@angular/common/http';
 
 describe('CommentComponent', () => {
   const COMMENT = COMMENTS[0];
@@ -20,6 +22,8 @@ describe('CommentComponent', () => {
       TagInputModule,
       TranslateModule.forRoot(),
       EvaluateMathExpressionsModule,
+      HttpClientModule,
+      AngularEditorModule,
     ],
     detectChanges: false,
   });
@@ -43,7 +47,6 @@ describe('CommentComponent', () => {
     spectator.detectChanges();
 
     expect(getControl(spectator, 'title')).toHaveValue(COMMENT.title);
-    expect(getControl(spectator, 'text')).toHaveValue(COMMENT.text);
     expect(spectator.query('.comment__tags .tag__text')).toHaveText(COMMENT.tags[0]);
   });
 

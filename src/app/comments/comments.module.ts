@@ -13,6 +13,7 @@ import { CommentsService } from './comments.service';
 import { CommentsFilterComponent } from './comments-filter/comments-filter.component';
 import { EvaluateMathExpressionsModule } from '../common/html-expression-pipe/evaluate-math-expressions.module';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBarConfig, MatSnackBarModule } from '@angular/material/snack-bar';
+import { AngularEditorModule } from '@kolkov/angular-editor';
 
 @NgModule({
   declarations: [CommentsComponent, CommentComponent, AddCommentComponent, CommentsFilterComponent],
@@ -26,6 +27,7 @@ import { MAT_SNACK_BAR_DEFAULT_OPTIONS, MatSnackBarConfig, MatSnackBarModule } f
     NgxErrorMessageModule,
     EvaluateMathExpressionsModule,
     MatSnackBarModule,
+    AngularEditorModule,
   ],
   providers: [
     CommentsHttpService,

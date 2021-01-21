@@ -14,7 +14,9 @@
   padding: 20px;
 
   &__text {
-    margin-top: var(--input-margin);
+    ::ng-deep .angular-editor {
+      margin-top: var(--input-margin);
+    }
   }
 
   &__tag {
@@ -36,27 +38,5 @@
     button {
       margin-left: 10px;
     }
-  }
-
-  &__show-preview {
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-
-    color: #757575;
-    font: 400 13px/20px Roboto, 'Helvetica Neue', sans-serif;
-    letter-spacing: normal;
-    line-height: 1.5;
-
-    input {
-      margin-right: 10px;
-    }
-  }
-
-  &__preview {
-    margin: 10px 0;
-    border: 1px solid #c5c5c5;
-    border-radius: 3px;
-    padding: 10px;
   }
 }

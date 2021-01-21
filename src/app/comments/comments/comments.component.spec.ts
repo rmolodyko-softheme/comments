@@ -10,6 +10,8 @@ import { CommentsService } from '../comments.service';
 import { of } from 'rxjs';
 import { COMMENTS, TAGS } from '../../../testing/mock-data';
 import { EvaluateMathExpressionsModule } from '../../common/html-expression-pipe/evaluate-math-expressions.module';
+import { AngularEditorModule } from '@kolkov/angular-editor';
+import { HttpClientModule } from '@angular/common/http';
 
 describe('CommentsListComponent', () => {
   let spectator: Spectator<CommentsComponent>;
@@ -24,6 +26,8 @@ describe('CommentsListComponent', () => {
       TagInputModule,
       TranslateModule.forRoot(),
       EvaluateMathExpressionsModule,
+      HttpClientModule,
+      AngularEditorModule,
     ],
     detectChanges: false,
     shallow: true,

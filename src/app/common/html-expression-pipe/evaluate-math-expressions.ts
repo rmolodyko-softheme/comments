@@ -13,7 +13,7 @@ const DEFAULT_OPERATORS = {
 
 export function evaluateMathExpressions(text: string, operators = DEFAULT_OPERATORS) {
   const opRegExp = operatorsRegExp(operators);
-  const findExpressionRegExp = new RegExp(`(\\s|^|\\()(\\d+((${opRegExp})\\d+)+)(\\s|\\)|$)`, 'g');
+  const findExpressionRegExp = new RegExp(`(\\s|^|\\(|\\>)(\\d+((${opRegExp})\\d+)+)(\\<|\\s|\\)|$)`, 'g');
 
   return text?.replace(findExpressionRegExp, (...args) => {
     return args[1] + args[2] + `(=${calculate(args[2], operators)})` + args[args.length - 3];

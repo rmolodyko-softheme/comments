@@ -13,7 +13,6 @@ export class AddCommentComponent {
   @Output() add = new EventEmitter();
 
   _form: FormGroup;
-  _showPreview = false;
 
   constructor(private readonly fb: FormBuilder, private readonly cd: ChangeDetectorRef) {
     this._form = this.fb.group({
@@ -30,15 +29,11 @@ export class AddCommentComponent {
       tags: [],
     } as Comment);
     this._form.markAsUntouched();
+    this.cd.markForCheck();
   }
 
   addComment() {
     this.add.emit(this._form.value);
     this.clear();
-  }
-
-  togglePreview() {
-    this._showPreview = !this._showPreview;
-    this.cd.markForCheck();
   }
 }
