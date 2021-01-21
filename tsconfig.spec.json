@@ -9,5 +9,5 @@
     "types": ["jest", "node"]
   },
   "include": ["src/**/*.spec.ts", "src/**/*.d.ts"],
-  "exclude": ["src/environments/*.ts", "main.ts", "polyfills.ts", "**/*.spec.ts"]
+  "exclude": ["src/environments/*.ts", "main.ts", "polyfills.ts"]
 }

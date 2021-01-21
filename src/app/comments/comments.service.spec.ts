@@ -78,7 +78,7 @@ describe('CommentsService', () => {
     expect(getCommentTags(COMMENTS)).toEqual(TAGS);
   });
 
-  it('should filter comments by tags', () => {
+  it('should filter comments by existing tags', () => {
     expect(filterCommentsByTags([COMMENTS, TAGS])).toEqual([COMMENTS[0]]);
   });
 });
