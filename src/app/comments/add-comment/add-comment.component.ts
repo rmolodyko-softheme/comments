@@ -33,11 +33,17 @@ export class AddCommentComponent {
   }
 
   addComment() {
-    this.add.emit(this._form.value);
+    // this.add.emit(this._form.value);
     this.clear();
   }
 
   togglePreview() {
+
+    let a: number;
+
+
+
+
     this._showPreview = !this._showPreview;
     this.cd.markForCheck();
   }
